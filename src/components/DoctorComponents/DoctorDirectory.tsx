@@ -12,7 +12,7 @@ import { Search } from "lucide-react";
 const DoctorDirectory = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
-  const [selectedSpecialty, setSelectedSpecialty] = useState("");
+  const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   
   useEffect(() => {
@@ -26,7 +26,7 @@ const DoctorDirectory = () => {
     // Apply filters when specialty or search query changes
     let results = doctors;
     
-    if (selectedSpecialty) {
+    if (selectedSpecialty && selectedSpecialty !== "all") {
       results = getDoctorsBySpecialty(selectedSpecialty);
     }
     
@@ -53,7 +53,7 @@ const DoctorDirectory = () => {
               <SelectValue placeholder="All Specialties" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Specialties</SelectItem>
+              <SelectItem value="all">All Specialties</SelectItem>
               {specialties.map((specialty) => (
                 <SelectItem key={specialty.id} value={specialty.name}>
                   {specialty.name}
