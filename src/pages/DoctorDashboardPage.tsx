@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/Layout/AppHeader";
 import AppointmentCard from "@/components/AppointmentComponents/AppointmentCard";
+import WeeklyCalendar from "@/components/AppointmentComponents/WeeklyCalendar";
+import ProfileEditor from "@/components/DoctorComponents/ProfileEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCurrentUser, isDoctor } from "@/lib/auth";
-import { getUserAppointments, confirmAppointment, markArrival } from "@/lib/appointmentService";
+import { getUserAppointments, confirmAppointment, markArrival, addDoctor } from "@/lib/appointmentService";
 import { useToast } from "@/components/ui/use-toast";
 import { Appointment, Doctor } from "@/types";
 import { Calendar, CheckCircle, Clock, AlertTriangle, User, MapPin } from "lucide-react";
@@ -15,6 +17,7 @@ import { Calendar, CheckCircle, Clock, AlertTriangle, User, MapPin } from "lucid
 const DoctorDashboardPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -23,8 +26,8 @@ const DoctorDashboardPage = () => {
     
     if (!currentUser || !isDoctor(currentUser)) {
       toast({
-        title: "Access Denied",
-        description: "Please log in as a doctor to access this page",
+        title: "Acceso Denegado",
+        description: "Por favor inicie sesión como médico para acceder a esta página",
         variant: "destructive",
       });
       navigate("/login");
@@ -61,14 +64,14 @@ const DoctorDashboardPage = () => {
         );
         
         toast({
-          title: "Appointment Confirmed",
-          description: "You have successfully confirmed the appointment",
+          title: "Cita Confirmada",
+          description: "Ha confirmado la cita exitosamente",
         });
       }
     } catch (error) {
       toast({
-        title: "Confirmation Failed",
-        description: "There was an error confirming the appointment",
+        title: "Error de Confirmación",
+        description: "Hubo un error al confirmar la cita",
         variant: "destructive",
       });
     }
@@ -79,16 +82,39 @@ const DoctorDashboardPage = () => {
       markArrival(appointmentId, "doctor", minutesLate);
       
       toast({
-        title: "Patient Arrival Marked",
-        description: `Patient has been marked as ${minutesLate > 15 ? "late" : "on time"} (${minutesLate} minutes).`,
+        title: "Llegada del Paciente Registrada",
+        description: `El paciente ha sido marcado como ${minutesLate > 15 ? "tarde" : "a tiempo"} (${minutesLate} minutos).`,
       });
       
       // In a real app, this would trigger penalties or refunds if applicable
     } catch (error) {
       toast({
         title: "Error",
-        description: "There was an error marking patient arrival",
+        description: "Hubo un error al registrar la llegada del paciente",
         variant: "destructive",
+      });
+    }
+  };
+
+  // Handler for updating doctor profile
+  const handleUpdateProfile = (updatedDoctor: Doctor) => {
+    if (doctor) {
+      // In a real app, this would be an API call to update the doctor's profile
+      const newDoctor = addDoctor({
+        name: updatedDoctor.name,
+        specialty: updatedDoctor.specialty,
+        location: updatedDoctor.location, 
+        profileImage: updatedDoctor.profileImage,
+        email: updatedDoctor.email,
+        userType: "doctor"
+      });
+      
+      // Update local state
+      setDoctor({
+        ...newDoctor,
+        name: updatedDoctor.name,
+        specialty: updatedDoctor.specialty,
+        profileImage: updatedDoctor.profileImage
       });
     }
   };
@@ -104,9 +130,9 @@ const DoctorDashboardPage = () => {
       
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Doctor Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Panel del Médico</h1>
           <p className="text-gray-600 mt-2">
-            Manage your schedule and patient appointments
+            Administre su horario y citas de pacientes
           </p>
         </div>
         
@@ -134,55 +160,60 @@ const DoctorDashboardPage = () => {
                     </div>
                     <div className="flex items-center justify-center md:justify-start">
                       <User className="h-4 w-4 text-gray-500 mr-1" />
-                      <span className="text-sm text-gray-600">{totalPatients} Total Patients</span>
+                      <span className="text-sm text-gray-600">{totalPatients} Pacientes Totales</span>
                     </div>
                   </div>
                 </div>
                 <div className="mt-4 md:mt-0 flex justify-center">
-                  <Button variant="outline">Edit Profile</Button>
+                  <Button variant="outline" onClick={() => setIsProfileEditorOpen(true)}>
+                    Editar Perfil
+                  </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
         
+        {/* Weekly Calendar */}
+        <WeeklyCalendar appointments={appointments} />
+        
         {/* Stats Section */}
         <div className="grid gap-6 md:grid-cols-3 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Appointments</CardTitle>
+              <CardTitle className="text-sm font-medium">Citas Totales</CardTitle>
               <Calendar className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalAppointments}</div>
               <p className="text-xs text-muted-foreground">
-                All time appointments
+                Todas las citas
               </p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
+              <CardTitle className="text-sm font-medium">Confirmadas</CardTitle>
               <CheckCircle className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{confirmedAppointments}</div>
               <p className="text-xs text-muted-foreground">
-                Ready for patient visits
+                Listas para visitas de pacientes
               </p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Today's Schedule</CardTitle>
+              <CardTitle className="text-sm font-medium">Horario de Hoy</CardTitle>
               <Clock className="h-4 w-4 text-medical-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{todayAppointments.length}</div>
               <p className="text-xs text-muted-foreground">
-                Appointments for today
+                Citas para hoy
               </p>
             </CardContent>
           </Card>
@@ -191,9 +222,9 @@ const DoctorDashboardPage = () => {
         {/* Pending Appointments Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Pending Confirmations</h2>
+            <h2 className="text-xl font-semibold">Confirmaciones Pendientes</h2>
             <Button variant="outline" onClick={() => navigate("/appointments")}>
-              View All Appointments
+              Ver Todas las Citas
             </Button>
           </div>
           
@@ -201,9 +232,9 @@ const DoctorDashboardPage = () => {
             <Card>
               <CardContent className="py-10 flex flex-col items-center justify-center text-center">
                 <CheckCircle className="h-8 w-8 text-green-500 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900">No pending confirmations</h3>
+                <h3 className="text-lg font-medium text-gray-900">No hay confirmaciones pendientes</h3>
                 <p className="mt-2 text-sm text-gray-500 max-w-sm">
-                  You have no appointments that need your confirmation.
+                  No tiene citas que necesiten su confirmación.
                 </p>
               </CardContent>
             </Card>
@@ -224,15 +255,15 @@ const DoctorDashboardPage = () => {
         
         {/* Today's Schedule Section */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Today's Schedule</h2>
+          <h2 className="text-xl font-semibold mb-4">Horario de Hoy</h2>
           
           {todayAppointments.length === 0 ? (
             <Card>
               <CardContent className="py-10 flex flex-col items-center justify-center text-center">
                 <AlertTriangle className="h-8 w-8 text-yellow-500 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900">No appointments today</h3>
+                <h3 className="text-lg font-medium text-gray-900">No hay citas hoy</h3>
                 <p className="mt-2 text-sm text-gray-500 max-w-sm">
-                  You have no scheduled appointments for today.
+                  No tiene citas programadas para hoy.
                 </p>
               </CardContent>
             </Card>
@@ -251,6 +282,16 @@ const DoctorDashboardPage = () => {
           )}
         </div>
       </main>
+      
+      {/* Profile Editor Dialog */}
+      {doctor && (
+        <ProfileEditor
+          doctor={doctor}
+          open={isProfileEditorOpen}
+          onClose={() => setIsProfileEditorOpen(false)}
+          onUpdate={handleUpdateProfile}
+        />
+      )}
     </div>
   );
 };

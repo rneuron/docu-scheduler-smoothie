@@ -1,3 +1,4 @@
+
 import { Appointment, TimeSlot, Doctor } from "@/types";
 import { mockAppointments, mockTimeSlots, mockDoctors } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
@@ -25,13 +26,28 @@ export const getAvailableTimeSlots = (doctorId: string): TimeSlot[] => {
 
 // Add a new doctor to the system
 export const addDoctor = (doctor: Omit<Doctor, "id">): Doctor => {
-  const newDoctor: Doctor = {
-    ...doctor,
-    id: Math.random().toString(36).substr(2, 9),
-  };
+  // Check if this is an update for an existing doctor
+  const existingDoctorIndex = doctors.findIndex(d => d.email === doctor.email);
   
-  doctors.push(newDoctor);
-  return newDoctor;
+  if (existingDoctorIndex !== -1) {
+    // Update existing doctor
+    const updatedDoctor = {
+      ...doctors[existingDoctorIndex],
+      ...doctor
+    };
+    
+    doctors[existingDoctorIndex] = updatedDoctor;
+    return updatedDoctor;
+  } else {
+    // Create new doctor
+    const newDoctor: Doctor = {
+      ...doctor,
+      id: Math.random().toString(36).substr(2, 9),
+    };
+    
+    doctors.push(newDoctor);
+    return newDoctor;
+  }
 };
 
 // Book an appointment
@@ -110,7 +126,7 @@ export const processPayment = async (appointmentId: string): Promise<boolean> =>
     
     return true;
   } catch (error) {
-    console.error("Payment processing error:", error);
+    console.error("Error al procesar el pago:", error);
     return false;
   }
 };
@@ -131,7 +147,7 @@ export const processRefund = async (appointmentId: string): Promise<boolean> => 
     
     return true;
   } catch (error) {
-    console.error("Refund processing error:", error);
+    console.error("Error al procesar el reembolso:", error);
     return false;
   }
 };
@@ -151,14 +167,14 @@ export const markArrival = async (
   if (minutesLate > 15) {
     if (userType === 'patient') {
       toast({
-        title: "Late Fee Applied",
-        description: "A penalty fee has been charged because you arrived more than 15 minutes late.",
+        title: "Cargo por Tardanza Aplicado",
+        description: "Se ha cobrado una penalización porque llegó más de 15 minutos tarde.",
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Appointment Refunded",
-        description: "The appointment fee has been refunded because the doctor arrived more than 15 minutes late.",
+        title: "Cita Reembolsada",
+        description: "La tarifa de la cita ha sido reembolsada porque el médico llegó más de 15 minutos tarde.",
       });
       await processRefund(appointmentId);
     }
