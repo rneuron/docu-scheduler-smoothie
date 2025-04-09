@@ -38,8 +38,8 @@ const PaymentModal = ({
     
     if (!cardNumber || !expiryDate || !cvv) {
       toast({
-        title: "Incomplete Form",
-        description: "Please fill in all payment details",
+        title: "Formulario Incompleto",
+        description: "Por favor complete todos los datos de pago",
         variant: "destructive",
       });
       return;
@@ -53,21 +53,21 @@ const PaymentModal = ({
       
       if (success) {
         toast({
-          title: "Payment Successful",
-          description: "Your appointment has been paid successfully",
+          title: "Pago Exitoso",
+          description: "Su cita ha sido pagada con éxito",
         });
         onPaymentSuccess();
       } else {
         toast({
-          title: "Payment Failed",
-          description: "There was an error processing your payment",
+          title: "Fallo en el Pago",
+          description: "Hubo un error al procesar su pago",
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: "Payment Error",
-        description: "There was an error processing your payment",
+        title: "Error de Pago",
+        description: "Hubo un error al procesar su pago",
         variant: "destructive",
       });
     } finally {
@@ -80,15 +80,15 @@ const PaymentModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Payment Information</DialogTitle>
+          <DialogTitle>Información de Pago</DialogTitle>
           <DialogDescription>
-            Enter your payment details to complete your appointment booking.
+            Ingrese sus datos de pago para completar la reserva de su cita.
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="cardNumber">Card Number</Label>
+            <Label htmlFor="cardNumber">Número de Tarjeta</Label>
             <Input
               id="cardNumber"
               placeholder="1234 5678 9012 3456"
@@ -99,10 +99,10 @@ const PaymentModal = ({
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="expiryDate">Expiry Date</Label>
+              <Label htmlFor="expiryDate">Fecha de Vencimiento</Label>
               <Input
                 id="expiryDate"
-                placeholder="MM/YY"
+                placeholder="MM/AA"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
               />
@@ -123,24 +123,24 @@ const PaymentModal = ({
           
           <div className="pt-4 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Appointment Fee:</span>
+              <span className="text-sm font-medium">Tarifa de la Cita:</span>
               <span className="font-medium">$75.00</span>
             </div>
             <div className="text-xs text-muted-foreground">
-              <p>By proceeding, you agree to the late arrival policy:</p>
+              <p>Al continuar, acepta la política de llegadas tardías:</p>
               <ul className="list-disc pl-5 mt-1">
-                <li>Patient late more than 15 min: $25 penalty fee</li>
-                <li>Doctor late more than 15 min: Automatic refund</li>
+                <li>Paciente que llega más de 15 min tarde: Tarifa de penalización de $25</li>
+                <li>Médico que llega más de 15 min tarde: Reembolso automático</li>
               </ul>
             </div>
           </div>
           
           <DialogFooter className="pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isProcessing}>
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" disabled={isProcessing}>
-              {isProcessing ? "Processing..." : "Pay Now"}
+              {isProcessing ? "Procesando..." : "Pagar Ahora"}
             </Button>
           </DialogFooter>
         </form>

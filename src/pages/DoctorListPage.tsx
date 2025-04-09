@@ -9,9 +9,9 @@ const DoctorListPage = () => {
       
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Find a Doctor</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Buscar un Médico</h1>
           <p className="text-gray-600 mt-2">
-            Browse through our directory of medical professionals and book an appointment
+            Explore nuestro directorio de profesionales médicos y reserve una cita
           </p>
         </div>
         

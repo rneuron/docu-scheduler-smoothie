@@ -27,8 +27,8 @@ const AppointmentsPage = () => {
     
     if (!currentUser) {
       toast({
-        title: "Login Required",
-        description: "Please log in to view your appointments",
+        title: "Se Requiere Iniciar Sesión",
+        description: "Por favor inicie sesión para ver sus citas",
         variant: "destructive",
       });
       navigate("/login");
@@ -82,14 +82,14 @@ const AppointmentsPage = () => {
         );
         
         toast({
-          title: "Appointment Confirmed",
-          description: "You have successfully confirmed the appointment",
+          title: "Cita Confirmada",
+          description: "Ha confirmado la cita con éxito",
         });
       }
     } catch (error) {
       toast({
-        title: "Confirmation Failed",
-        description: "There was an error confirming the appointment",
+        title: "Error en la Confirmación",
+        description: "Hubo un error al confirmar la cita",
         variant: "destructive",
       });
     }
@@ -114,15 +114,15 @@ const AppointmentsPage = () => {
       markArrival(appointmentId, userType, minutesLate);
       
       toast({
-        title: "Arrival Marked",
-        description: `You've been marked as ${minutesLate > 15 ? "late" : "on time"} (${minutesLate} minutes).`,
+        title: "Llegada Registrada",
+        description: `Se ha registrado su llegada ${minutesLate > 15 ? "tarde" : "a tiempo"} (${minutesLate} minutos).`,
       });
       
       // In a real app, this would trigger penalties or refunds if applicable
     } catch (error) {
       toast({
         title: "Error",
-        description: "There was an error marking your arrival",
+        description: "Hubo un error al registrar su llegada",
         variant: "destructive",
       });
     }
@@ -134,17 +134,17 @@ const AppointmentsPage = () => {
       
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Appointments</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Mis Citas</h1>
           <p className="text-gray-600 mt-2">
-            Manage your scheduled appointments
+            Administre sus citas programadas
           </p>
         </div>
         
         <Tabs defaultValue="upcoming" className="w-full" onValueChange={setSelectedTab}>
           <TabsList className="mb-6">
-            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-            <TabsTrigger value="past">Past</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="upcoming">Próximas</TabsTrigger>
+            <TabsTrigger value="past">Pasadas</TabsTrigger>
+            <TabsTrigger value="all">Todas</TabsTrigger>
           </TabsList>
           
           <TabsContent value={selectedTab}>
@@ -152,11 +152,11 @@ const AppointmentsPage = () => {
               <Card>
                 <CardContent className="py-12 flex flex-col items-center justify-center text-center">
                   <CalendarX className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900">No appointments found</h3>
+                  <h3 className="text-lg font-medium text-gray-900">No se encontraron citas</h3>
                   <p className="mt-2 text-sm text-gray-500 max-w-sm">
                     {selectedTab === "upcoming" 
-                      ? "You don't have any upcoming appointments. Would you like to book one?" 
-                      : "You don't have any past appointments."}
+                      ? "No tiene citas próximas. ¿Le gustaría reservar una?" 
+                      : "No tiene citas pasadas."}
                   </p>
                 </CardContent>
               </Card>

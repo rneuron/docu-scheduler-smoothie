@@ -32,8 +32,8 @@ const LoginForm = () => {
     
     if (user) {
       toast({
-        title: "Login Successful",
-        description: `Welcome back, ${user.name}!`,
+        title: "Inicio de Sesión Exitoso",
+        description: `¡Bienvenido de nuevo, ${user.name}!`,
       });
       
       if (user.userType === "doctor") {
@@ -43,8 +43,8 @@ const LoginForm = () => {
       }
     } else {
       toast({
-        title: "Login Failed",
-        description: "Invalid email or password. For demo, use the sample accounts.",
+        title: "Inicio de Sesión Fallido",
+        description: "Correo o contraseña inválidos. Para la demostración, utilice las cuentas de ejemplo.",
         variant: "destructive",
       });
     }
@@ -53,22 +53,22 @@ const LoginForm = () => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+        <CardTitle className="text-2xl text-center">Iniciar Sesión</CardTitle>
         <CardDescription className="text-center">
-          Enter your credentials to access your account
+          Ingrese sus credenciales para acceder a su cuenta
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="patient" className="w-full mb-6" onValueChange={(v) => setUserType(v as "patient" | "doctor")}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="patient">Patient</TabsTrigger>
-            <TabsTrigger value="doctor">Doctor</TabsTrigger>
+            <TabsTrigger value="patient">Paciente</TabsTrigger>
+            <TabsTrigger value="doctor">Médico</TabsTrigger>
           </TabsList>
         </Tabs>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Correo Electrónico</Label>
             <Input
               id="email"
               type="email"
@@ -79,34 +79,34 @@ const LoginForm = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Contraseña</Label>
             <Input
               id="password"
               type="password"
-              placeholder="For demo, any password works"
+              placeholder="Para la demostración, cualquier contraseña funciona"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           
           <Button type="submit" className="w-full">
-            Sign In
+            Iniciar Sesión
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col space-y-2">
         <div className="text-sm text-center text-muted-foreground">
-          Don't have an account?{" "}
+          ¿No tiene una cuenta?{" "}
           <Button variant="link" className="p-0" onClick={() => navigate("/register")}>
-            Sign Up
+            Registrarse
           </Button>
         </div>
         
         <div className="text-xs text-muted-foreground text-center p-2 border border-dashed rounded">
-          <strong>Demo Accounts:</strong><br/>
-          Patient: alex@example.com<br/>
-          Doctor: jane.smith@example.com<br/>
-          (Password is optional for demo)
+          <strong>Cuentas de Demostración:</strong><br/>
+          Paciente: alex@example.com<br/>
+          Médico: jane.smith@example.com<br/>
+          (La contraseña es opcional para la demostración)
         </div>
       </CardFooter>
     </Card>

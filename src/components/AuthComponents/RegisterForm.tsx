@@ -27,8 +27,8 @@ const RegisterForm = () => {
     
     if (password !== confirmPassword) {
       toast({
-        title: "Passwords Don't Match",
-        description: "Please make sure your passwords match",
+        title: "Las Contraseñas No Coinciden",
+        description: "Por favor asegúrese de que sus contraseñas coincidan",
         variant: "destructive",
       });
       return;
@@ -48,8 +48,8 @@ const RegisterForm = () => {
       const user = register(userData, password);
       
       toast({
-        title: "Account Created",
-        description: "Your account has been created successfully!",
+        title: "Cuenta Creada",
+        description: "¡Su cuenta ha sido creada exitosamente!",
       });
       
       if (user.userType === "doctor") {
@@ -59,8 +59,8 @@ const RegisterForm = () => {
       }
     } catch (error) {
       toast({
-        title: "Registration Failed",
-        description: "There was a problem creating your account",
+        title: "Registro Fallido",
+        description: "Hubo un problema al crear su cuenta",
         variant: "destructive",
       });
     }
@@ -69,25 +69,25 @@ const RegisterForm = () => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl text-center">Create An Account</CardTitle>
+        <CardTitle className="text-2xl text-center">Crear Una Cuenta</CardTitle>
         <CardDescription className="text-center">
-          Enter your information to create an account
+          Ingrese su información para crear una cuenta
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="patient" className="w-full mb-6" onValueChange={(v) => setUserType(v as "patient" | "doctor")}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="patient">Patient</TabsTrigger>
-            <TabsTrigger value="doctor">Doctor</TabsTrigger>
+            <TabsTrigger value="patient">Paciente</TabsTrigger>
+            <TabsTrigger value="doctor">Médico</TabsTrigger>
           </TabsList>
         </Tabs>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">Nombre Completo</Label>
             <Input
               id="name"
-              placeholder="Enter your full name"
+              placeholder="Ingrese su nombre completo"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -95,11 +95,11 @@ const RegisterForm = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Correo Electrónico</Label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="Ingrese su correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -109,10 +109,10 @@ const RegisterForm = () => {
           {userType === "doctor" && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="specialty">Specialty</Label>
+                <Label htmlFor="specialty">Especialidad</Label>
                 <Select value={specialty} onValueChange={setSpecialty} required>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a specialty" />
+                    <SelectValue placeholder="Seleccione una especialidad" />
                   </SelectTrigger>
                   <SelectContent>
                     {specialties.map((spec) => (
@@ -125,10 +125,10 @@ const RegisterForm = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="location">Ubicación</Label>
                 <Input
                   id="location"
-                  placeholder="City, State"
+                  placeholder="Ciudad, Estado"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   required
@@ -138,11 +138,11 @@ const RegisterForm = () => {
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Contraseña</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Create a password"
+              placeholder="Cree una contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -150,11 +150,11 @@ const RegisterForm = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
             <Input
               id="confirmPassword"
               type="password"
-              placeholder="Confirm your password"
+              placeholder="Confirme su contraseña"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -162,15 +162,15 @@ const RegisterForm = () => {
           </div>
           
           <Button type="submit" className="w-full">
-            Create Account
+            Crear Cuenta
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <div className="text-sm text-muted-foreground">
-          Already have an account?{" "}
+          ¿Ya tiene una cuenta?{" "}
           <Button variant="link" className="p-0" onClick={() => navigate("/login")}>
-            Sign In
+            Iniciar Sesión
           </Button>
         </div>
       </CardFooter>

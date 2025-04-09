@@ -47,18 +47,18 @@ const AppHeader = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-gray-700 hover:text-medical-600 font-medium">
-              Home
+              Inicio
             </Link>
             <Link to="/doctors" className="text-gray-700 hover:text-medical-600 font-medium">
-              Find Doctors
+              Buscar Médicos
             </Link>
             {user ? (
               <>
                 <Link to={dashboardLink} className="text-gray-700 hover:text-medical-600 font-medium">
-                  Dashboard
+                  Panel
                 </Link>
                 <Link to="/appointments" className="text-gray-700 hover:text-medical-600 font-medium">
-                  My Appointments
+                  Mis Citas
                 </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -74,12 +74,12 @@ const AppHeader = () => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem>
                       <UserCircle className="mr-2 h-4 w-4" />
-                      <span>My Profile</span>
+                      <span>Mi Perfil</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>Cerrar Sesión</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -87,10 +87,10 @@ const AppHeader = () => {
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="outline" onClick={() => navigate("/login")}>
-                  Sign In
+                  Iniciar Sesión
                 </Button>
                 <Button onClick={() => navigate("/register")}>
-                  Sign Up
+                  Registrarse
                 </Button>
               </div>
             )}
@@ -113,14 +113,14 @@ const AppHeader = () => {
               className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
               onClick={() => setIsMenuOpen(false)}
             >
-              Home
+              Inicio
             </Link>
             <Link 
               to="/doctors" 
               className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
               onClick={() => setIsMenuOpen(false)}
             >
-              Find Doctors
+              Buscar Médicos
             </Link>
             {user ? (
               <>
@@ -129,14 +129,14 @@ const AppHeader = () => {
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Dashboard
+                  Panel
                 </Link>
                 <Link 
                   to="/appointments" 
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  My Appointments
+                  Mis Citas
                 </Link>
                 <div className="border-t border-gray-200 pt-4 mt-4">
                   <div className="flex items-center px-3">
@@ -161,7 +161,7 @@ const AppHeader = () => {
                         setIsMenuOpen(false);
                       }}
                     >
-                      Sign out
+                      Cerrar Sesión
                     </button>
                   </div>
                 </div>
@@ -176,7 +176,7 @@ const AppHeader = () => {
                     setIsMenuOpen(false);
                   }}
                 >
-                  Sign In
+                  Iniciar Sesión
                 </Button>
                 <Button 
                   className="w-full" 
@@ -185,7 +185,7 @@ const AppHeader = () => {
                     setIsMenuOpen(false);
                   }}
                 >
-                  Sign Up
+                  Registrarse
                 </Button>
               </div>
             )}

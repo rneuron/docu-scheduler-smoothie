@@ -27,8 +27,8 @@ const BookAppointmentPage = () => {
         setDoctor(foundDoctor);
       } else {
         toast({
-          title: "Doctor Not Found",
-          description: "The doctor you're looking for does not exist",
+          title: "Médico No Encontrado",
+          description: "El médico que está buscando no existe",
           variant: "destructive",
         });
         navigate("/doctors");
@@ -43,8 +43,8 @@ const BookAppointmentPage = () => {
     
     if (!currentUser) {
       toast({
-        title: "Login Required",
-        description: "Please log in to book an appointment",
+        title: "Se Requiere Iniciar Sesión",
+        description: "Por favor inicie sesión para reservar una cita",
         variant: "destructive",
       });
       navigate("/login");
@@ -67,15 +67,15 @@ const BookAppointmentPage = () => {
       bookAppointment(appointmentData);
       
       toast({
-        title: "Appointment Booked",
-        description: "Your appointment has been booked successfully!",
+        title: "Cita Reservada",
+        description: "Su cita ha sido reservada exitosamente!",
       });
       
       navigate("/appointments");
     } catch (error) {
       toast({
-        title: "Booking Failed",
-        description: "There was an error booking your appointment",
+        title: "Error en la Reserva",
+        description: "Hubo un error al reservar su cita",
         variant: "destructive",
       });
     }
@@ -87,7 +87,7 @@ const BookAppointmentPage = () => {
         <AppHeader />
         <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold">Loading...</h1>
+            <h1 className="text-2xl font-bold">Cargando...</h1>
           </div>
         </main>
       </div>
@@ -100,9 +100,9 @@ const BookAppointmentPage = () => {
       
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Book an Appointment</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Reservar una Cita</h1>
           <p className="text-gray-600 mt-2">
-            Select a date and time slot to schedule your appointment
+            Seleccione una fecha y un horario para programar su cita
           </p>
         </div>
         
@@ -126,7 +126,7 @@ const BookAppointmentPage = () => {
                     <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
                     <div>
                       <p className="text-sm">{doctor.location}</p>
-                      <p className="text-xs text-gray-500">Location</p>
+                      <p className="text-xs text-gray-500">Ubicación</p>
                     </div>
                   </div>
                   
@@ -134,7 +134,7 @@ const BookAppointmentPage = () => {
                     <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
                     <div>
                       <p className="text-sm">(555) 123-4567</p>
-                      <p className="text-xs text-gray-500">Phone</p>
+                      <p className="text-xs text-gray-500">Teléfono</p>
                     </div>
                   </div>
                   
@@ -142,15 +142,15 @@ const BookAppointmentPage = () => {
                     <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
                     <div>
                       <p className="text-sm">{doctor.email}</p>
-                      <p className="text-xs text-gray-500">Email</p>
+                      <p className="text-xs text-gray-500">Correo</p>
                     </div>
                   </div>
                 </div>
                 
                 <div className="mt-6 pt-6 border-t">
-                  <h3 className="text-md font-semibold mb-2">About</h3>
+                  <h3 className="text-md font-semibold mb-2">Sobre el Médico</h3>
                   <p className="text-sm text-gray-600">
-                    {doctor.bio || "Experienced healthcare professional providing quality care to patients."}
+                    {doctor.bio || "Profesional de la salud con experiencia brindando atención de calidad a los pacientes."}
                   </p>
                 </div>
               </CardContent>

@@ -47,8 +47,8 @@ const BookingCalendar = ({ doctor, onBookAppointment }: BookingCalendarProps) =>
   const handleBookAppointment = () => {
     if (!user) {
       toast({
-        title: "Login Required",
-        description: "Please log in to book an appointment",
+        title: "Se Requiere Iniciar Sesión",
+        description: "Por favor inicie sesión para reservar una cita",
         variant: "destructive",
       });
       navigate("/login");
@@ -69,7 +69,7 @@ const BookingCalendar = ({ doctor, onBookAppointment }: BookingCalendarProps) =>
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <Label className="text-base font-medium mb-2 block">Select Date</Label>
+          <Label className="text-base font-medium mb-2 block">Seleccionar Fecha</Label>
           <Card>
             <CardContent className="p-4">
               <Calendar
@@ -84,13 +84,13 @@ const BookingCalendar = ({ doctor, onBookAppointment }: BookingCalendarProps) =>
         </div>
         
         <div>
-          <Label className="text-base font-medium mb-2 block">Available Time Slots</Label>
+          <Label className="text-base font-medium mb-2 block">Horarios Disponibles</Label>
           <Card>
             <CardContent className="p-4">
               {availableSlots.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-sm text-gray-500">
-                    No available slots for this date. Please select another date.
+                    No hay horarios disponibles para esta fecha. Por favor seleccione otra fecha.
                   </p>
                 </div>
               ) : (
@@ -119,7 +119,7 @@ const BookingCalendar = ({ doctor, onBookAppointment }: BookingCalendarProps) =>
           disabled={!selectedSlot}
           onClick={handleBookAppointment}
         >
-          Book Appointment
+          Reservar Cita
         </Button>
       </div>
     </div>

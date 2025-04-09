@@ -47,13 +47,13 @@ const DoctorDirectory = () => {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="specialty">Specialty</Label>
+          <Label htmlFor="specialty">Especialidad</Label>
           <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
             <SelectTrigger id="specialty">
-              <SelectValue placeholder="All Specialties" />
+              <SelectValue placeholder="Todas las Especialidades" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Specialties</SelectItem>
+              <SelectItem value="all">Todas las Especialidades</SelectItem>
               {specialties.map((specialty) => (
                 <SelectItem key={specialty.id} value={specialty.name}>
                   {specialty.name}
@@ -64,12 +64,12 @@ const DoctorDirectory = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="search">Search</Label>
+          <Label htmlFor="search">Buscar</Label>
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               id="search"
-              placeholder="Search by name, specialty or location"
+              placeholder="Buscar por nombre, especialidad o ubicación"
               className="pl-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -80,9 +80,9 @@ const DoctorDirectory = () => {
       
       {filteredDoctors.length === 0 ? (
         <div className="text-center py-12">
-          <h3 className="text-lg font-medium text-gray-900">No doctors found</h3>
+          <h3 className="text-lg font-medium text-gray-900">No se encontraron médicos</h3>
           <p className="mt-2 text-sm text-gray-500">
-            Try adjusting your search or filter to find what you're looking for.
+            Intente ajustar su búsqueda o filtro para encontrar lo que está buscando.
           </p>
         </div>
       ) : (
