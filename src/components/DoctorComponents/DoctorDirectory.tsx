@@ -25,15 +25,33 @@ const DoctorDirectory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const doctorsPerPage = 6;
   
-  useEffect(() => {
-    // Cargar todos los médicos inicialmente
+  // Refreshes the doctor list - now including useEffect dependency
+  const refreshDoctors = () => {
     const allDoctors = getAllDoctors();
+    console.log("Médicos cargados:", allDoctors.length);
     setDoctors(allDoctors);
-    setFilteredDoctors(allDoctors);
+    
+    // Apply current filters to the refreshed list
+    if (selectedSpecialty && selectedSpecialty !== "all") {
+      setFilteredDoctors(getDoctorsBySpecialty(selectedSpecialty));
+    } else {
+      setFilteredDoctors(allDoctors);
+    }
+  };
+  
+  useEffect(() => {
+    // Carga todos los médicos inicialmente
+    refreshDoctors();
+    
+    // Set up polling to refresh the doctor list every 30 seconds
+    const intervalId = setInterval(refreshDoctors, 30000);
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
   
   useEffect(() => {
-    // Aplicar filtros cuando cambia la especialidad o la búsqueda
+    // Apply filters when specialty or search changes
     let results = doctors;
     
     if (selectedSpecialty && selectedSpecialty !== "all") {
@@ -51,10 +69,10 @@ const DoctorDirectory = () => {
     }
     
     setFilteredDoctors(results);
-    setCurrentPage(1); // Resetear a la primera página cuando cambian los filtros
+    setCurrentPage(1); // Reset to first page when filters change
   }, [selectedSpecialty, searchQuery, doctors]);
 
-  // Obtener los médicos para la página actual
+  // Get doctors for current page
   const indexOfLastDoctor = currentPage * doctorsPerPage;
   const indexOfFirstDoctor = indexOfLastDoctor - doctorsPerPage;
   const currentDoctors = filteredDoctors.slice(indexOfFirstDoctor, indexOfLastDoctor);

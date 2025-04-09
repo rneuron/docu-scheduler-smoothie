@@ -1,4 +1,3 @@
-
 import { Appointment, TimeSlot, Doctor } from "@/types";
 import { mockAppointments, mockTimeSlots, mockDoctors } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
@@ -8,9 +7,9 @@ let appointments = [...mockAppointments];
 let timeSlots = [...mockTimeSlots];
 let doctors = [...mockDoctors];
 
-// Get available time slots for a specific doctor
-export const getAvailableTimeSlots = (doctorId: string): TimeSlot[] => {
-  return timeSlots.filter(slot => slot.doctorId === doctorId && !slot.isBooked);
+// Get all doctors - make sure we're returning all doctors in the system
+export const getAllDoctors = (): Doctor[] => {
+  return doctors;
 };
 
 // Get doctors by specialty
@@ -19,14 +18,24 @@ export const getDoctorsBySpecialty = (specialty: string): Doctor[] => {
   return doctors.filter(doctor => doctor.specialty === specialty);
 };
 
-// Get all doctors
-export const getAllDoctors = (): Doctor[] => {
-  return doctors;
+// Get available time slots for a specific doctor
+export const getAvailableTimeSlots = (doctorId: string): TimeSlot[] => {
+  return timeSlots.filter(slot => slot.doctorId === doctorId && !slot.isBooked);
+};
+
+// Add a new doctor to the system
+export const addDoctor = (doctor: Omit<Doctor, "id">): Doctor => {
+  const newDoctor: Doctor = {
+    ...doctor,
+    id: Math.random().toString(36).substr(2, 9),
+  };
+  
+  doctors.push(newDoctor);
+  return newDoctor;
 };
 
 // Book an appointment
 export const bookAppointment = (appointment: Partial<Appointment>): Appointment => {
-  // In a real app, this would create an appointment in the database
   const newAppointment: Appointment = {
     id: Math.random().toString(36).substr(2, 9),
     patientId: appointment.patientId!,
@@ -44,12 +53,10 @@ export const bookAppointment = (appointment: Partial<Appointment>): Appointment 
     patientName: appointment.patientName!,
   };
   
-  // Update the time slot to be booked
   timeSlots = timeSlots.map(slot => 
     slot.id === newAppointment.timeSlotId ? { ...slot, isBooked: true } : slot
   );
   
-  // Add the appointment to the mock database
   appointments.push(newAppointment);
   
   return newAppointment;
@@ -78,12 +85,10 @@ export const confirmAppointment = (appointmentId: string, userType: 'patient' | 
     appointment.doctorConfirmed = true;
   }
   
-  // If both confirmed, update status
   if (appointment.patientConfirmed && appointment.doctorConfirmed) {
     appointment.status = 'confirmed';
   }
   
-  // Update in the mock database
   appointments[appointmentIndex] = appointment;
   
   return appointment;
@@ -91,18 +96,13 @@ export const confirmAppointment = (appointmentId: string, userType: 'patient' | 
 
 // Process payment
 export const processPayment = async (appointmentId: string): Promise<boolean> => {
-  // In a real app, this would integrate with PayPal API
-  // For demo purposes, we'll just simulate a successful payment
-  
   try {
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     const appointmentIndex = appointments.findIndex(a => a.id === appointmentId);
     
     if (appointmentIndex === -1) return false;
     
-    // Update payment status
     appointments[appointmentIndex] = {
       ...appointments[appointmentIndex],
       paymentStatus: 'paid'
@@ -117,18 +117,13 @@ export const processPayment = async (appointmentId: string): Promise<boolean> =>
 
 // Process refund
 export const processRefund = async (appointmentId: string): Promise<boolean> => {
-  // In a real app, this would integrate with PayPal API
-  // For demo purposes, we'll just simulate a successful refund
-  
   try {
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     const appointmentIndex = appointments.findIndex(a => a.id === appointmentId);
     
     if (appointmentIndex === -1) return false;
     
-    // Update payment status
     appointments[appointmentIndex] = {
       ...appointments[appointmentIndex],
       paymentStatus: 'refunded'
@@ -153,23 +148,18 @@ export const markArrival = async (
   
   const appointment = appointments[appointmentIndex];
   
-  // Check if the user is late (more than 15 minutes)
   if (minutesLate > 15) {
     if (userType === 'patient') {
-      // Patient is late - automatic penalty
       toast({
         title: "Late Fee Applied",
         description: "A penalty fee has been charged because you arrived more than 15 minutes late.",
         variant: "destructive",
       });
-      // In a real app, this would trigger the PayPal API to charge a penalty
     } else {
-      // Doctor is late - automatic refund
       toast({
         title: "Appointment Refunded",
         description: "The appointment fee has been refunded because the doctor arrived more than 15 minutes late.",
       });
-      // In a real app, this would trigger the PayPal API to process a refund
       await processRefund(appointmentId);
     }
   }
