@@ -2,75 +2,155 @@
 import { Doctor, Patient, TimeSlot, Appointment, Specialty } from "@/types";
 
 export const specialties: Specialty[] = [
-  { id: "1", name: "Cardiology" },
-  { id: "2", name: "Dermatology" },
-  { id: "3", name: "Neurology" },
-  { id: "4", name: "Orthopedics" },
-  { id: "5", name: "Pediatrics" },
-  { id: "6", name: "Psychiatry" },
-  { id: "7", name: "Ophthalmology" },
-  { id: "8", name: "Gynecology" },
+  { id: "1", name: "Cardiología" },
+  { id: "2", name: "Dermatología" },
+  { id: "3", name: "Neurología" },
+  { id: "4", name: "Traumatología" },
+  { id: "5", name: "Pediatría" },
+  { id: "6", name: "Psiquiatría" },
+  { id: "7", name: "Oftalmología" },
+  { id: "8", name: "Ginecología" },
 ];
 
 export const mockDoctors: Doctor[] = [
   {
     id: "1",
-    name: "Dr. Jane Smith",
-    email: "jane.smith@example.com",
+    name: "Dra. Laura Martínez",
+    email: "laura.martinez@ejemplo.com",
     userType: "doctor",
-    specialty: "Cardiology",
-    location: "New York, NY",
+    specialty: "Cardiología",
+    location: "Madrid, España",
     profileImage: "https://randomuser.me/api/portraits/women/21.jpg",
-    bio: "Experienced cardiologist specializing in heart disease prevention.",
+    bio: "Cardióloga especializada en prevención de enfermedades cardíacas con más de 15 años de experiencia.",
   },
   {
     id: "2",
-    name: "Dr. John Davis",
-    email: "john.davis@example.com",
+    name: "Dr. Carlos Ruiz",
+    email: "carlos.ruiz@ejemplo.com",
     userType: "doctor",
-    specialty: "Dermatology",
-    location: "Los Angeles, CA",
+    specialty: "Dermatología",
+    location: "Barcelona, España",
     profileImage: "https://randomuser.me/api/portraits/men/32.jpg",
-    bio: "Board-certified dermatologist with expertise in skin cancer screening.",
+    bio: "Dermatólogo certificado con experiencia en tratamientos para el cáncer de piel y problemas cutáneos complejos.",
   },
   {
     id: "3",
-    name: "Dr. Sarah Johnson",
-    email: "sarah.johnson@example.com",
+    name: "Dra. María López",
+    email: "maria.lopez@ejemplo.com",
     userType: "doctor",
-    specialty: "Neurology",
-    location: "Chicago, IL",
+    specialty: "Neurología",
+    location: "Valencia, España",
     profileImage: "https://randomuser.me/api/portraits/women/45.jpg",
-    bio: "Neurologist focused on migraines and movement disorders.",
+    bio: "Neuróloga especializada en migrañas y trastornos del movimiento. Amplia experiencia en enfermedades neurodegenerativas.",
   },
   {
     id: "4",
-    name: "Dr. Michael Chen",
-    email: "michael.chen@example.com",
+    name: "Dr. Antonio García",
+    email: "antonio.garcia@ejemplo.com",
     userType: "doctor",
-    specialty: "Orthopedics",
-    location: "Boston, MA",
+    specialty: "Traumatología",
+    location: "Sevilla, España",
     profileImage: "https://randomuser.me/api/portraits/men/52.jpg",
-    bio: "Orthopedic surgeon specializing in sports injuries and joint replacements.",
+    bio: "Cirujano ortopédico especializado en lesiones deportivas y reemplazos articulares. Pionero en técnicas mínimamente invasivas.",
+  },
+  {
+    id: "5",
+    name: "Dra. Ana Rodríguez",
+    email: "ana.rodriguez@ejemplo.com",
+    userType: "doctor",
+    specialty: "Pediatría",
+    location: "Bilbao, España",
+    profileImage: "https://randomuser.me/api/portraits/women/28.jpg",
+    bio: "Pediatra con 20 años de experiencia en atención infantil. Especialista en desarrollo infantil y enfermedades respiratorias.",
+  },
+  {
+    id: "6",
+    name: "Dr. Francisco Torres",
+    email: "francisco.torres@ejemplo.com",
+    userType: "doctor",
+    specialty: "Psiquiatría",
+    location: "Zaragoza, España",
+    profileImage: "https://randomuser.me/api/portraits/men/41.jpg",
+    bio: "Psiquiatra con enfoque en trastornos de ansiedad y depresión. Experiencia en terapias cognitivo-conductuales avanzadas.",
+  },
+  {
+    id: "7",
+    name: "Dra. Elena Navarro",
+    email: "elena.navarro@ejemplo.com",
+    userType: "doctor",
+    specialty: "Oftalmología",
+    location: "Málaga, España",
+    profileImage: "https://randomuser.me/api/portraits/women/67.jpg",
+    bio: "Oftalmóloga especializada en cirugía láser y tratamientos para la degeneración macular. Pionera en nuevas técnicas quirúrgicas.",
+  },
+  {
+    id: "8",
+    name: "Dr. Miguel Hernández",
+    email: "miguel.hernandez@ejemplo.com",
+    userType: "doctor",
+    specialty: "Ginecología",
+    location: "Murcia, España",
+    profileImage: "https://randomuser.me/api/portraits/men/61.jpg",
+    bio: "Ginecólogo con amplia experiencia en salud reproductiva. Especialista en tratamientos de fertilidad y embarazos de alto riesgo.",
+  },
+  {
+    id: "9",
+    name: "Dra. Lucía Moreno",
+    email: "lucia.moreno@ejemplo.com",
+    userType: "doctor",
+    specialty: "Cardiología",
+    location: "Alicante, España",
+    profileImage: "https://randomuser.me/api/portraits/women/82.jpg",
+    bio: "Cardióloga intervencionista especializada en procedimientos mínimamente invasivos. Experiencia en cardiopatías congénitas.",
+  },
+  {
+    id: "10",
+    name: "Dr. Javier Sánchez",
+    email: "javier.sanchez@ejemplo.com",
+    userType: "doctor",
+    specialty: "Dermatología",
+    location: "Granada, España",
+    profileImage: "https://randomuser.me/api/portraits/men/75.jpg",
+    bio: "Dermatólogo estético con amplia formación en tratamientos anti-envejecimiento y problemas cutáneos crónicos.",
+  },
+  {
+    id: "11",
+    name: "Dra. Patricia Díaz",
+    email: "patricia.diaz@ejemplo.com",
+    userType: "doctor",
+    specialty: "Neurología",
+    location: "Valladolid, España",
+    profileImage: "https://randomuser.me/api/portraits/women/37.jpg",
+    bio: "Neuróloga especializada en trastornos del sueño y epilepsia. Investigadora activa en nuevos tratamientos neurológicos.",
+  },
+  {
+    id: "12",
+    name: "Dr. Alberto Jiménez",
+    email: "alberto.jimenez@ejemplo.com",
+    userType: "doctor",
+    specialty: "Traumatología",
+    location: "Córdoba, España",
+    profileImage: "https://randomuser.me/api/portraits/men/22.jpg",
+    bio: "Traumatólogo especializado en medicina deportiva y lesiones de rodilla. Consultor para equipos deportivos profesionales.",
   },
 ];
 
 export const mockPatients: Patient[] = [
   {
     id: "1",
-    name: "Alex Thompson",
-    email: "alex@example.com",
+    name: "Alex Torres",
+    email: "alex@ejemplo.com",
     userType: "patient",
   },
   {
     id: "2",
-    name: "Maria Rodriguez",
-    email: "maria@example.com",
+    name: "María Rodríguez",
+    email: "maria@ejemplo.com",
     userType: "patient",
   },
 ];
 
-// Generate time slots for next 7 days
+// Generar horarios disponibles para los próximos 7 días
 const generateTimeSlots = (): TimeSlot[] => {
   const slots: TimeSlot[] = [];
   const now = new Date();
@@ -80,9 +160,9 @@ const generateTimeSlots = (): TimeSlot[] => {
     date.setDate(now.getDate() + d);
     const dateStr = date.toISOString().split('T')[0];
     
-    // For each doctor
+    // Para cada médico
     mockDoctors.forEach(doctor => {
-      // Morning slots
+      // Horarios de mañana
       for (let hour = 9; hour < 12; hour++) {
         slots.push({
           id: `${doctor.id}-${dateStr}-${hour}`,
@@ -90,11 +170,11 @@ const generateTimeSlots = (): TimeSlot[] => {
           date: dateStr,
           startTime: `${hour}:00`,
           endTime: `${hour + 1}:00`,
-          isBooked: Math.random() > 0.7, // randomly mark some as booked
+          isBooked: Math.random() > 0.7, // marcar algunos como reservados aleatoriamente
         });
       }
       
-      // Afternoon slots
+      // Horarios de tarde
       for (let hour = 13; hour < 17; hour++) {
         slots.push({
           id: `${doctor.id}-${dateStr}-${hour}`,
@@ -102,7 +182,7 @@ const generateTimeSlots = (): TimeSlot[] => {
           date: dateStr,
           startTime: `${hour}:00`,
           endTime: `${hour + 1}:00`,
-          isBooked: Math.random() > 0.7, // randomly mark some as booked
+          isBooked: Math.random() > 0.7, // marcar algunos como reservados aleatoriamente
         });
       }
     });
@@ -113,7 +193,7 @@ const generateTimeSlots = (): TimeSlot[] => {
 
 export const mockTimeSlots = generateTimeSlots();
 
-// Sample appointments
+// Citas de ejemplo
 export const mockAppointments: Appointment[] = [
   {
     id: "1",
@@ -127,9 +207,9 @@ export const mockAppointments: Appointment[] = [
     patientConfirmed: true,
     doctorConfirmed: true,
     paymentStatus: "paid",
-    specialtyName: "Cardiology",
-    doctorName: "Dr. Jane Smith",
-    patientName: "Alex Thompson",
+    specialtyName: "Cardiología",
+    doctorName: "Dra. Laura Martínez",
+    patientName: "Alex Torres",
   },
   {
     id: "2",
@@ -143,11 +223,11 @@ export const mockAppointments: Appointment[] = [
     patientConfirmed: false,
     doctorConfirmed: true,
     paymentStatus: "pending",
-    specialtyName: "Dermatology",
-    doctorName: "Dr. John Davis",
-    patientName: "Maria Rodriguez",
+    specialtyName: "Dermatología",
+    doctorName: "Dr. Carlos Ruiz",
+    patientName: "María Rodríguez",
   },
 ];
 
-// Let's create a user store with both doctors and patients
+// Almacén de usuarios con médicos y pacientes
 export const users = [...mockDoctors, ...mockPatients];

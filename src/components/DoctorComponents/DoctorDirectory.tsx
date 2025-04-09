@@ -8,22 +8,32 @@ import { getAllDoctors, getDoctorsBySpecialty } from "@/lib/appointmentService";
 import DoctorCard from "./DoctorCard";
 import { Doctor } from "@/types";
 import { Search } from "lucide-react";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from "@/components/ui/pagination";
 
 const DoctorDirectory = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const doctorsPerPage = 6;
   
   useEffect(() => {
-    // Load all doctors initially
+    // Cargar todos los médicos inicialmente
     const allDoctors = getAllDoctors();
     setDoctors(allDoctors);
     setFilteredDoctors(allDoctors);
   }, []);
   
   useEffect(() => {
-    // Apply filters when specialty or search query changes
+    // Aplicar filtros cuando cambia la especialidad o la búsqueda
     let results = doctors;
     
     if (selectedSpecialty && selectedSpecialty !== "all") {
@@ -41,7 +51,14 @@ const DoctorDirectory = () => {
     }
     
     setFilteredDoctors(results);
+    setCurrentPage(1); // Resetear a la primera página cuando cambian los filtros
   }, [selectedSpecialty, searchQuery, doctors]);
+
+  // Obtener los médicos para la página actual
+  const indexOfLastDoctor = currentPage * doctorsPerPage;
+  const indexOfFirstDoctor = indexOfLastDoctor - doctorsPerPage;
+  const currentDoctors = filteredDoctors.slice(indexOfFirstDoctor, indexOfLastDoctor);
+  const totalPages = Math.ceil(filteredDoctors.length / doctorsPerPage);
   
   return (
     <div className="space-y-6">
@@ -86,11 +103,42 @@ const DoctorDirectory = () => {
           </p>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredDoctors.map((doctor) => (
-            <DoctorCard key={doctor.id} doctor={doctor} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {currentDoctors.map((doctor) => (
+              <DoctorCard key={doctor.id} doctor={doctor} />
+            ))}
+          </div>
+          
+          {totalPages > 1 && (
+            <Pagination className="mt-8">
+              <PaginationContent>
+                {currentPage > 1 && (
+                  <PaginationItem>
+                    <PaginationPrevious onClick={() => setCurrentPage(prev => prev - 1)} />
+                  </PaginationItem>
+                )}
+                
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <PaginationItem key={index}>
+                    <PaginationLink 
+                      isActive={currentPage === index + 1} 
+                      onClick={() => setCurrentPage(index + 1)}
+                    >
+                      {index + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                {currentPage < totalPages && (
+                  <PaginationItem>
+                    <PaginationNext onClick={() => setCurrentPage(prev => prev + 1)} />
+                  </PaginationItem>
+                )}
+              </PaginationContent>
+            </Pagination>
+          )}
+        </>
       )}
     </div>
   );

@@ -37,7 +37,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
         </div>
         <div className="p-6">
           <p className="text-gray-600 text-sm line-clamp-3">
-            {doctor.bio || "Experienced healthcare professional providing quality care to patients."}
+            {doctor.bio || "Profesional de la salud con experiencia brindando atención de calidad a pacientes."}
           </p>
         </div>
       </CardContent>
@@ -46,7 +46,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
           className="w-full" 
           onClick={() => navigate(`/book-appointment/${doctor.id}`)}
         >
-          Book Appointment
+          Reservar Cita
         </Button>
       </CardFooter>
     </Card>
