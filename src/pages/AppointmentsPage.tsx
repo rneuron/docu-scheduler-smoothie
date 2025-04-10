@@ -6,6 +6,9 @@ import AppointmentCard from "@/components/AppointmentComponents/AppointmentCard"
 import PaymentModal from "@/components/AppointmentComponents/PaymentModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Appointment } from "@/types";
 import { getCurrentUser, isDoctor, isPatient } from "@/lib/auth";
 import { getUserAppointments, confirmAppointment, markArrival } from "@/lib/appointmentService";
@@ -19,6 +22,8 @@ const AppointmentsPage = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState("");
   const [userType, setUserType] = useState<"patient" | "doctor">("patient");
+  const [confirmingAppointmentId, setConfirmingAppointmentId] = useState<string | null>(null);
+  const [isConfirmationChecked, setIsConfirmationChecked] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -70,14 +75,21 @@ const AppointmentsPage = () => {
   }, [selectedTab, appointments]);
 
   const handleConfirmAppointment = (appointmentId: string) => {
+    setConfirmingAppointmentId(appointmentId);
+    setIsConfirmationChecked(false);
+  };
+
+  const handleConfirmationProceed = () => {
+    if (!confirmingAppointmentId) return;
+    
     try {
-      const updatedAppointment = confirmAppointment(appointmentId, userType);
+      const updatedAppointment = confirmAppointment(confirmingAppointmentId, userType);
       
       if (updatedAppointment) {
         // Update the appointments state
         setAppointments(prevAppointments => 
           prevAppointments.map(app => 
-            app.id === appointmentId ? updatedAppointment : app
+            app.id === confirmingAppointmentId ? updatedAppointment : app
           )
         );
         
@@ -85,6 +97,12 @@ const AppointmentsPage = () => {
           title: "Cita Confirmada",
           description: "Ha confirmado la cita con éxito",
         });
+        
+        // If it's a patient, proceed to payment
+        if (userType === "patient") {
+          setSelectedAppointmentId(confirmingAppointmentId);
+          setIsPaymentModalOpen(true);
+        }
       }
     } catch (error) {
       toast({
@@ -92,6 +110,9 @@ const AppointmentsPage = () => {
         description: "Hubo un error al confirmar la cita",
         variant: "destructive",
       });
+    } finally {
+      setConfirmingAppointmentId(null);
+      setIsConfirmationChecked(false);
     }
   };
 
@@ -128,16 +149,35 @@ const AppointmentsPage = () => {
     }
   };
 
+  const getCreateAppointmentButton = () => {
+    if (userType === "doctor") {
+      return (
+        <Button onClick={() => navigate("/book-appointment/new")}>
+          Crear Cita
+        </Button>
+      );
+    } else {
+      return (
+        <Button onClick={() => navigate("/doctors")}>
+          Solicitar Cita
+        </Button>
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <AppHeader />
       
       <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mis Citas</h1>
-          <p className="text-gray-600 mt-2">
-            Administre sus citas programadas
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Mis Citas</h1>
+            <p className="text-gray-600 mt-2">
+              Administre sus citas programadas
+            </p>
+          </div>
+          {getCreateAppointmentButton()}
         </div>
         
         <Tabs defaultValue="upcoming" className="w-full" onValueChange={setSelectedTab}>
@@ -158,6 +198,11 @@ const AppointmentsPage = () => {
                       ? "No tiene citas próximas. ¿Le gustaría reservar una?" 
                       : "No tiene citas pasadas."}
                   </p>
+                  {selectedTab === "upcoming" && (
+                    <div className="mt-4">
+                      {getCreateAppointmentButton()}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ) : (
@@ -178,12 +223,51 @@ const AppointmentsPage = () => {
         </Tabs>
       </main>
       
+      {/* Payment Modal */}
       <PaymentModal
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
         appointmentId={selectedAppointmentId}
         onPaymentSuccess={handlePaymentSuccess}
       />
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmingAppointmentId !== null} onOpenChange={() => setConfirmingAppointmentId(null)}>
+        <DialogContent>
+          <DialogTitle>Confirmar Cita</DialogTitle>
+          <DialogDescription>
+            {userType === "patient" 
+              ? "Al confirmar esta cita, usted acepta las siguientes condiciones:"
+              : "Al confirmar esta cita, usted está aceptando la siguiente condición:"}
+          </DialogDescription>
+          
+          <div className="flex items-start space-x-2 mt-4">
+            <Checkbox 
+              id="confirmation-checkbox" 
+              checked={isConfirmationChecked}
+              onCheckedChange={() => setIsConfirmationChecked(!isConfirmationChecked)}
+              className="mt-1"
+            />
+            <label htmlFor="confirmation-checkbox" className="text-sm">
+              {userType === "patient"
+                ? "Entiendo que debo pagar por la cita y que si no asisto, no recibiré un reembolso. Si no confirmo la cita 12 horas antes, esta será cancelada automáticamente."
+                : "Entiendo que si llego más de 15 minutos tarde a esta cita, debo ofrecerla sin costo para el paciente. Estoy de acuerdo con esta política."}
+            </label>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmingAppointmentId(null)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleConfirmationProceed} 
+              disabled={!isConfirmationChecked}
+            >
+              {userType === "patient" ? "Confirmar y Proceder al Pago" : "Confirmar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

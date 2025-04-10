@@ -12,12 +12,16 @@ import { getCurrentUser, isDoctor } from "@/lib/auth";
 import { getUserAppointments, confirmAppointment, markArrival, addDoctor } from "@/lib/appointmentService";
 import { useToast } from "@/components/ui/use-toast";
 import { Appointment, Doctor } from "@/types";
-import { Calendar, CheckCircle, Clock, AlertTriangle, User, MapPin } from "lucide-react";
+import { Calendar, CheckCircle, Clock, AlertTriangle, User, MapPin, AlertDialog } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 const DoctorDashboardPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
+  const [confirmingAppointmentId, setConfirmingAppointmentId] = useState<string | null>(null);
+  const [isConfirmationChecked, setIsConfirmationChecked] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -41,25 +45,27 @@ const DoctorDashboardPage = () => {
     setAppointments(doctorAppointments);
   }, [navigate, toast]);
 
-  // Filter today's appointments
-  const today = new Date().toISOString().split('T')[0];
-  const todayAppointments = appointments.filter(
-    app => app.date === today && (app.status === "confirmed" || app.status === "pending")
-  );
-
+  // Filter pending appointments
   const pendingAppointments = appointments.filter(
     app => app.status === "pending" && !app.doctorConfirmed
   ).slice(0, 3);
 
   const handleConfirmAppointment = (appointmentId: string) => {
+    setConfirmingAppointmentId(appointmentId);
+    setIsConfirmationChecked(false);
+  };
+
+  const handleConfirmationProceed = () => {
+    if (!confirmingAppointmentId) return;
+    
     try {
-      const updatedAppointment = confirmAppointment(appointmentId, "doctor");
+      const updatedAppointment = confirmAppointment(confirmingAppointmentId, "doctor");
       
       if (updatedAppointment) {
         // Update the appointments state
         setAppointments(prevAppointments => 
           prevAppointments.map(app => 
-            app.id === appointmentId ? updatedAppointment : app
+            app.id === confirmingAppointmentId ? updatedAppointment : app
           )
         );
         
@@ -74,6 +80,9 @@ const DoctorDashboardPage = () => {
         description: "Hubo un error al confirmar la cita",
         variant: "destructive",
       });
+    } finally {
+      setConfirmingAppointmentId(null);
+      setIsConfirmationChecked(false);
     }
   };
 
@@ -174,9 +183,6 @@ const DoctorDashboardPage = () => {
           </Card>
         )}
         
-        {/* Weekly Calendar */}
-        <WeeklyCalendar appointments={appointments} />
-        
         {/* Stats Section */}
         <div className="grid gap-6 md:grid-cols-3 mb-8">
           <Card>
@@ -207,13 +213,13 @@ const DoctorDashboardPage = () => {
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Horario de Hoy</CardTitle>
-              <Clock className="h-4 w-4 text-medical-500" />
+              <CardTitle className="text-sm font-medium">Pendientes</CardTitle>
+              <Clock className="h-4 w-4 text-yellow-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{todayAppointments.length}</div>
+              <div className="text-2xl font-bold">{pendingAppointments.length}</div>
               <p className="text-xs text-muted-foreground">
-                Citas para hoy
+                Esperando confirmación
               </p>
             </CardContent>
           </Card>
@@ -223,9 +229,14 @@ const DoctorDashboardPage = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Confirmaciones Pendientes</h2>
-            <Button variant="outline" onClick={() => navigate("/appointments")}>
-              Ver Todas las Citas
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => navigate("/appointments")}>
+                Ver Todas las Citas
+              </Button>
+              <Button onClick={() => navigate("/book-appointment/new")}>
+                Crear Cita
+              </Button>
+            </div>
           </div>
           
           {pendingAppointments.length === 0 ? (
@@ -253,34 +264,8 @@ const DoctorDashboardPage = () => {
           )}
         </div>
         
-        {/* Today's Schedule Section */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Horario de Hoy</h2>
-          
-          {todayAppointments.length === 0 ? (
-            <Card>
-              <CardContent className="py-10 flex flex-col items-center justify-center text-center">
-                <AlertTriangle className="h-8 w-8 text-yellow-500 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900">No hay citas hoy</h3>
-                <p className="mt-2 text-sm text-gray-500 max-w-sm">
-                  No tiene citas programadas para hoy.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {todayAppointments.map((appointment) => (
-                <AppointmentCard
-                  key={appointment.id}
-                  appointment={appointment}
-                  userType="doctor"
-                  onConfirm={handleConfirmAppointment}
-                  onMarkArrival={handleMarkArrival}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Weekly Calendar */}
+        <WeeklyCalendar appointments={appointments} />
       </main>
       
       {/* Profile Editor Dialog */}
@@ -292,6 +277,40 @@ const DoctorDashboardPage = () => {
           onUpdate={handleUpdateProfile}
         />
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmingAppointmentId !== null} onOpenChange={() => setConfirmingAppointmentId(null)}>
+        <DialogContent>
+          <DialogTitle>Confirmar Cita</DialogTitle>
+          <DialogDescription>
+            Al confirmar esta cita, usted está aceptando la siguiente condición:
+          </DialogDescription>
+          
+          <div className="flex items-start space-x-2 mt-4">
+            <Checkbox 
+              id="confirmation-checkbox" 
+              checked={isConfirmationChecked}
+              onCheckedChange={() => setIsConfirmationChecked(!isConfirmationChecked)}
+              className="mt-1"
+            />
+            <label htmlFor="confirmation-checkbox" className="text-sm">
+              Entiendo que si llego más de 15 minutos tarde a esta cita, debo ofrecerla sin costo para el paciente. Estoy de acuerdo con esta política.
+            </label>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmingAppointmentId(null)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleConfirmationProceed} 
+              disabled={!isConfirmationChecked}
+            >
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

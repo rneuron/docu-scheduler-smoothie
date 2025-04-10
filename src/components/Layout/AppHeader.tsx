@@ -34,6 +34,10 @@ const AppHeader = () => {
   const dashboardLink = isDoctor(user) 
     ? "/doctor-dashboard" 
     : "/patient-dashboard";
+  
+  const dashboardLabel = isDoctor(user)
+    ? "Panel Médico"
+    : "Panel Paciente";
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
@@ -54,8 +58,15 @@ const AppHeader = () => {
             </Link>
             {user ? (
               <>
-                <Link to={dashboardLink} className="text-gray-700 hover:text-medical-600 font-medium">
-                  Panel
+                <Link 
+                  to={dashboardLink} 
+                  className={`font-medium px-3 py-1 rounded-md ${
+                    location.pathname === dashboardLink 
+                      ? "bg-medical-100 text-medical-700"
+                      : "text-gray-700 hover:text-medical-600"
+                  }`}
+                >
+                  {dashboardLabel}
                 </Link>
                 <Link to="/appointments" className="text-gray-700 hover:text-medical-600 font-medium">
                   Mis Citas
@@ -126,10 +137,14 @@ const AppHeader = () => {
               <>
                 <Link 
                   to={dashboardLink} 
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+                  className={`block px-3 py-2 text-base font-medium rounded-md ${
+                    location.pathname === dashboardLink
+                      ? "bg-medical-100 text-medical-700"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Panel
+                  {dashboardLabel}
                 </Link>
                 <Link 
                   to="/appointments" 
