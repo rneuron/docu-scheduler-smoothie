@@ -1,19 +1,17 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/Layout/AppHeader";
-import AppointmentCard from "@/components/AppointmentComponents/AppointmentCard";
 import WeeklyCalendar from "@/components/AppointmentComponents/WeeklyCalendar";
 import ProfileEditor from "@/components/DoctorComponents/ProfileEditor";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import DoctorProfileCard from "@/components/DoctorComponents/DoctorProfileCard";
+import DoctorStats from "@/components/DoctorComponents/DoctorStats";
+import PendingAppointmentsSection from "@/components/DoctorComponents/PendingAppointmentsSection";
+import AppointmentConfirmationDialog from "@/components/DoctorComponents/AppointmentConfirmationDialog";
 import { getCurrentUser, isDoctor } from "@/lib/auth";
 import { getUserAppointments, confirmAppointment, markArrival, addDoctor } from "@/lib/appointmentService";
 import { useToast } from "@/components/ui/use-toast";
 import { Appointment, Doctor } from "@/types";
-import { Calendar, CheckCircle, Clock, AlertTriangle, User, MapPin } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 const DoctorDashboardPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -132,6 +130,8 @@ const DoctorDashboardPage = () => {
   const totalAppointments = appointments.length;
   const confirmedAppointments = appointments.filter(app => app.status === "confirmed").length;
 
+  const closeConfirmationDialog = () => setConfirmingAppointmentId(null);
+
   return (
     <div className="min-h-screen flex flex-col">
       <AppHeader />
@@ -146,122 +146,26 @@ const DoctorDashboardPage = () => {
         
         {/* Doctor Profile Card */}
         {doctor && (
-          <Card className="mb-8">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row md:items-center">
-                <div className="flex-shrink-0 flex justify-center mb-4 md:mb-0 md:mr-6">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={doctor.profileImage} alt={doctor.name} />
-                    <AvatarFallback className="bg-medical-200 text-medical-800 text-xl">
-                      {doctor.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                <div className="flex-grow text-center md:text-left">
-                  <h2 className="text-2xl font-bold">{doctor.name}</h2>
-                  <p className="text-medical-600 font-medium">{doctor.specialty}</p>
-                  
-                  <div className="mt-2 flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                    <div className="flex items-center justify-center md:justify-start">
-                      <MapPin className="h-4 w-4 text-gray-500 mr-1" />
-                      <span className="text-sm text-gray-600">{doctor.location}</span>
-                    </div>
-                    <div className="flex items-center justify-center md:justify-start">
-                      <User className="h-4 w-4 text-gray-500 mr-1" />
-                      <span className="text-sm text-gray-600">{totalPatients} Pacientes Totales</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 md:mt-0 flex justify-center">
-                  <Button variant="outline" onClick={() => setIsProfileEditorOpen(true)}>
-                    Editar Perfil
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <DoctorProfileCard 
+            doctor={doctor} 
+            totalPatients={totalPatients} 
+            onEditProfile={() => setIsProfileEditorOpen(true)} 
+          />
         )}
         
-        {/* Stats Section */}
-        <div className="grid gap-6 md:grid-cols-3 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Citas Totales</CardTitle>
-              <Calendar className="h-4 w-4 text-gray-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalAppointments}</div>
-              <p className="text-xs text-muted-foreground">
-                Todas las citas
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Confirmadas</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{confirmedAppointments}</div>
-              <p className="text-xs text-muted-foreground">
-                Listas para visitas de pacientes
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Pendientes</CardTitle>
-              <Clock className="h-4 w-4 text-yellow-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{pendingAppointments.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Esperando confirmación
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Stats Dashboard */}
+        <DoctorStats 
+          totalAppointments={totalAppointments}
+          confirmedAppointments={confirmedAppointments}
+          pendingAppointments={pendingAppointments.length}
+        />
         
         {/* Pending Appointments Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Confirmaciones Pendientes</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate("/appointments")}>
-                Ver Todas las Citas
-              </Button>
-              <Button onClick={() => navigate("/book-appointment/new")}>
-                Crear Cita
-              </Button>
-            </div>
-          </div>
-          
-          {pendingAppointments.length === 0 ? (
-            <Card>
-              <CardContent className="py-10 flex flex-col items-center justify-center text-center">
-                <CheckCircle className="h-8 w-8 text-green-500 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900">No hay confirmaciones pendientes</h3>
-                <p className="mt-2 text-sm text-gray-500 max-w-sm">
-                  No tiene citas que necesiten su confirmación.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {pendingAppointments.map((appointment) => (
-                <AppointmentCard
-                  key={appointment.id}
-                  appointment={appointment}
-                  userType="doctor"
-                  onConfirm={handleConfirmAppointment}
-                  onMarkArrival={handleMarkArrival}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <PendingAppointmentsSection 
+          pendingAppointments={pendingAppointments}
+          onConfirm={handleConfirmAppointment}
+          onMarkArrival={handleMarkArrival}
+        />
         
         {/* Weekly Calendar */}
         <WeeklyCalendar appointments={appointments} />
@@ -278,38 +182,13 @@ const DoctorDashboardPage = () => {
       )}
 
       {/* Confirmation Dialog */}
-      <Dialog open={confirmingAppointmentId !== null} onOpenChange={() => setConfirmingAppointmentId(null)}>
-        <DialogContent>
-          <DialogTitle>Confirmar Cita</DialogTitle>
-          <DialogDescription>
-            Al confirmar esta cita, usted está aceptando la siguiente condición:
-          </DialogDescription>
-          
-          <div className="flex items-start space-x-2 mt-4">
-            <Checkbox 
-              id="confirmation-checkbox" 
-              checked={isConfirmationChecked}
-              onCheckedChange={() => setIsConfirmationChecked(!isConfirmationChecked)}
-              className="mt-1"
-            />
-            <label htmlFor="confirmation-checkbox" className="text-sm">
-              Entiendo que si llego más de 15 minutos tarde a esta cita, debo ofrecerla sin costo para el paciente. Estoy de acuerdo con esta política.
-            </label>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmingAppointmentId(null)}>
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleConfirmationProceed} 
-              disabled={!isConfirmationChecked}
-            >
-              Confirmar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AppointmentConfirmationDialog 
+        isOpen={confirmingAppointmentId !== null}
+        onClose={closeConfirmationDialog}
+        onConfirm={handleConfirmationProceed}
+        isChecked={isConfirmationChecked}
+        onCheckedChange={setIsConfirmationChecked}
+      />
     </div>
   );
 };
