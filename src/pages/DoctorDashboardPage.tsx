@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/Layout/AppHeader";
@@ -12,7 +11,7 @@ import { getCurrentUser, isDoctor } from "@/lib/auth";
 import { getUserAppointments, confirmAppointment, markArrival, addDoctor } from "@/lib/appointmentService";
 import { useToast } from "@/components/ui/use-toast";
 import { Appointment, Doctor } from "@/types";
-import { Calendar, CheckCircle, Clock, AlertTriangle, User, MapPin, AlertDialog } from "lucide-react";
+import { Calendar, CheckCircle, Clock, AlertTriangle, User, MapPin } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
