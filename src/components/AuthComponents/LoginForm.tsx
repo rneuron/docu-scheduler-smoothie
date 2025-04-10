@@ -13,40 +13,53 @@ const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState<"patient" | "doctor">("patient");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // Demo user shortcuts
-    if (userType === "patient" && !email) {
-      setEmail("alex@example.com");
-      setPassword("password123");
-    } else if (userType === "doctor" && !email) {
-      setEmail("jane.smith@example.com");
-      setPassword("password123");
-    }
-    
-    const user = login(email, password);
-    
-    if (user) {
-      toast({
-        title: "Inicio de Sesión Exitoso",
-        description: `¡Bienvenido de nuevo, ${user.name}!`,
-      });
-      
-      if (user.userType === "doctor") {
-        navigate("/doctor-dashboard");
-      } else {
-        navigate("/patient-dashboard");
+    try {
+      // Demo user shortcuts
+      if (userType === "patient" && !email) {
+        setEmail("alex@example.com");
+        setPassword("password123");
+      } else if (userType === "doctor" && !email) {
+        setEmail("jane.smith@example.com");
+        setPassword("password123");
       }
-    } else {
+      
+      const user = await login(email, password);
+      
+      if (user) {
+        toast({
+          title: "Inicio de Sesión Exitoso",
+          description: `¡Bienvenido de nuevo, ${user.name}!`,
+        });
+        
+        if (user.userType === "doctor") {
+          navigate("/doctor-dashboard");
+        } else {
+          navigate("/patient-dashboard");
+        }
+      } else {
+        toast({
+          title: "Inicio de Sesión Fallido",
+          description: "Correo o contraseña inválidos. Para la demostración, utilice las cuentas de ejemplo.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       toast({
-        title: "Inicio de Sesión Fallido",
-        description: "Correo o contraseña inválidos. Para la demostración, utilice las cuentas de ejemplo.",
+        title: "Error",
+        description: "Ocurrió un error al iniciar sesión. Por favor intente nuevamente.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,14 +96,14 @@ const LoginForm = () => {
             <Input
               id="password"
               type="password"
-              placeholder="Para la demostración, cualquier contraseña funciona"
+              placeholder="Ingrese su contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           
-          <Button type="submit" className="w-full">
-            Iniciar Sesión
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
           </Button>
         </form>
       </CardContent>
@@ -106,7 +119,7 @@ const LoginForm = () => {
           <strong>Cuentas de Demostración:</strong><br/>
           Paciente: alex@example.com<br/>
           Médico: jane.smith@example.com<br/>
-          (La contraseña es opcional para la demostración)
+          (Contraseña: password123)
         </div>
       </CardFooter>
     </Card>

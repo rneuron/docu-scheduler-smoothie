@@ -14,6 +14,9 @@ import AppointmentsPage from "./pages/AppointmentsPage";
 import PatientDashboardPage from "./pages/PatientDashboardPage";
 import DoctorDashboardPage from "./pages/DoctorDashboardPage";
 
+// Import utility functions for global access
+import "./scripts/utilityFunctions";
+
 const queryClient = new QueryClient();
 
 const App = () => (

@@ -19,10 +19,11 @@ const RegisterForm = () => {
   const [userType, setUserType] = useState<"patient" | "doctor">("patient");
   const [specialty, setSpecialty] = useState("");
   const [location, setLocation] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -33,6 +34,8 @@ const RegisterForm = () => {
       });
       return;
     }
+    
+    setIsLoading(true);
     
     try {
       const userData = {
@@ -45,24 +48,35 @@ const RegisterForm = () => {
         }),
       };
       
-      const user = register(userData, password);
+      const user = await register(userData, password);
       
-      toast({
-        title: "Cuenta Creada",
-        description: "¡Su cuenta ha sido creada exitosamente!",
-      });
-      
-      if (user.userType === "doctor") {
-        navigate("/doctor-dashboard");
+      if (user) {
+        toast({
+          title: "Cuenta Creada",
+          description: "¡Su cuenta ha sido creada exitosamente!",
+        });
+        
+        if (user.userType === "doctor") {
+          navigate("/doctor-dashboard");
+        } else {
+          navigate("/patient-dashboard");
+        }
       } else {
-        navigate("/patient-dashboard");
+        toast({
+          title: "Registro Fallido",
+          description: "Hubo un problema al crear su cuenta. Es posible que el correo ya esté en uso.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
+      console.error("Registration error:", error);
       toast({
         title: "Registro Fallido",
         description: "Hubo un problema al crear su cuenta",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -161,8 +175,8 @@ const RegisterForm = () => {
             />
           </div>
           
-          <Button type="submit" className="w-full">
-            Crear Cuenta
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Creando cuenta..." : "Crear Cuenta"}
           </Button>
         </form>
       </CardContent>
