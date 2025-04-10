@@ -36,22 +36,22 @@ const BookAppointmentPage = () => {
     }
   }, [doctorId, navigate, toast]);
 
-  const handleBookAppointment = (timeSlotId: string, date: string, startTime: string, endTime: string) => {
+  const handleBookAppointment = async (timeSlotId: string, date: string, startTime: string, endTime: string) => {
     if (!doctor) return;
     
-    const currentUser = getCurrentUser();
-    
-    if (!currentUser) {
-      toast({
-        title: "Se Requiere Iniciar Sesión",
-        description: "Por favor inicie sesión para reservar una cita",
-        variant: "destructive",
-      });
-      navigate("/login");
-      return;
-    }
-    
     try {
+      const currentUser = await getCurrentUser();
+      
+      if (!currentUser) {
+        toast({
+          title: "Se Requiere Iniciar Sesión",
+          description: "Por favor inicie sesión para reservar una cita",
+          variant: "destructive",
+        });
+        navigate("/login");
+        return;
+      }
+      
       const appointmentData = {
         patientId: currentUser.id,
         doctorId: doctor.id,
@@ -73,6 +73,7 @@ const BookAppointmentPage = () => {
       
       navigate("/appointments");
     } catch (error) {
+      console.error("Error booking appointment:", error);
       toast({
         title: "Error en la Reserva",
         description: "Hubo un error al reservar su cita",

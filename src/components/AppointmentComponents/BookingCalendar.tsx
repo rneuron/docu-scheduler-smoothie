@@ -25,8 +25,17 @@ const BookingCalendar = ({ doctor, onBookAppointment }: BookingCalendarProps) =>
   const navigate = useNavigate();
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    setUser(currentUser);
+    const fetchCurrentUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+        setUser(null);
+      }
+    };
+    
+    fetchCurrentUser();
   }, []);
 
   useEffect(() => {

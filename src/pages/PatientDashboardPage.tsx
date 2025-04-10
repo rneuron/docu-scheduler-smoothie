@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "@/components/Layout/AppHeader";
@@ -21,21 +20,35 @@ const PatientDashboardPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
+    const fetchCurrentUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        
+        if (!currentUser || !isPatient(currentUser)) {
+          toast({
+            title: "Access Denied",
+            description: "Please log in as a patient to access this page",
+            variant: "destructive",
+          });
+          navigate("/login");
+          return;
+        }
+        
+        // Get patient appointments
+        const userAppointments = getUserAppointments(currentUser.id, "patient");
+        setAppointments(userAppointments);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo cargar la información del usuario",
+          variant: "destructive",
+        });
+        navigate("/login");
+      }
+    };
     
-    if (!currentUser || !isPatient(currentUser)) {
-      toast({
-        title: "Access Denied",
-        description: "Please log in as a patient to access this page",
-        variant: "destructive",
-      });
-      navigate("/login");
-      return;
-    }
-    
-    // Get patient appointments
-    const userAppointments = getUserAppointments(currentUser.id, "patient");
-    setAppointments(userAppointments);
+    fetchCurrentUser();
   }, [navigate, toast]);
 
   const upcomingAppointments = appointments.filter(

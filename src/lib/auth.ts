@@ -32,7 +32,7 @@ export const login = async (email: string, password: string): Promise<User | nul
         userType: 'doctor',
         specialty: doctorData.specialty,
         location: doctorData.location,
-        profileImage: doctorData.profile_image,
+        profileImage: doctorData.profile_image || null, // Handle potential undefined
       };
       return userData;
     } else {
@@ -80,7 +80,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
       userType: 'doctor',
       specialty: doctorData.specialty,
       location: doctorData.location,
-      profileImage: doctorData.profile_image,
+      profileImage: doctorData.profile_image || null, // Handle potential undefined
     };
     return userData;
   } else {

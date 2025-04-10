@@ -28,28 +28,42 @@ const AppointmentsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
+    const fetchCurrentUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        
+        if (!currentUser) {
+          toast({
+            title: "Se Requiere Iniciar Sesión",
+            description: "Por favor inicie sesión para ver sus citas",
+            variant: "destructive",
+          });
+          navigate("/login");
+          return;
+        }
+        
+        // Set user type
+        if (isDoctor(currentUser)) {
+          setUserType("doctor");
+        } else if (isPatient(currentUser)) {
+          setUserType("patient");
+        }
+        
+        // Get user appointments
+        const userAppointments = getUserAppointments(currentUser.id, currentUser.userType);
+        setAppointments(userAppointments);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo cargar la información del usuario",
+          variant: "destructive",
+        });
+        navigate("/login");
+      }
+    };
     
-    if (!currentUser) {
-      toast({
-        title: "Se Requiere Iniciar Sesión",
-        description: "Por favor inicie sesión para ver sus citas",
-        variant: "destructive",
-      });
-      navigate("/login");
-      return;
-    }
-    
-    // Set user type
-    if (isDoctor(currentUser)) {
-      setUserType("doctor");
-    } else if (isPatient(currentUser)) {
-      setUserType("patient");
-    }
-    
-    // Get user appointments
-    const userAppointments = getUserAppointments(currentUser.id, currentUser.userType);
-    setAppointments(userAppointments);
+    fetchCurrentUser();
   }, [navigate, toast]);
 
   useEffect(() => {
@@ -123,11 +137,19 @@ const AppointmentsPage = () => {
 
   const handlePaymentSuccess = () => {
     // Reload the appointments after successful payment
-    const currentUser = getCurrentUser();
-    if (currentUser) {
-      const userAppointments = getUserAppointments(currentUser.id, currentUser.userType);
-      setAppointments(userAppointments);
-    }
+    const fetchUserAppointments = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          const userAppointments = getUserAppointments(currentUser.id, currentUser.userType);
+          setAppointments(userAppointments);
+        }
+      } catch (error) {
+        console.error("Error fetching appointments after payment:", error);
+      }
+    };
+    
+    fetchUserAppointments();
   };
 
   const handleMarkArrival = (appointmentId: string, minutesLate: number) => {

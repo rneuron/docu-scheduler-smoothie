@@ -23,23 +23,37 @@ const DoctorDashboardPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
+    const fetchCurrentUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        
+        if (!currentUser || !isDoctor(currentUser)) {
+          toast({
+            title: "Acceso Denegado",
+            description: "Por favor inicie sesión como médico para acceder a esta página",
+            variant: "destructive",
+          });
+          navigate("/login");
+          return;
+        }
+        
+        setDoctor(currentUser);
+        
+        // Get doctor appointments
+        const doctorAppointments = getUserAppointments(currentUser.id, "doctor");
+        setAppointments(doctorAppointments);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo cargar la información del usuario",
+          variant: "destructive",
+        });
+        navigate("/login");
+      }
+    };
     
-    if (!currentUser || !isDoctor(currentUser)) {
-      toast({
-        title: "Acceso Denegado",
-        description: "Por favor inicie sesión como médico para acceder a esta página",
-        variant: "destructive",
-      });
-      navigate("/login");
-      return;
-    }
-    
-    setDoctor(currentUser);
-    
-    // Get doctor appointments
-    const doctorAppointments = getUserAppointments(currentUser.id, "doctor");
-    setAppointments(doctorAppointments);
+    fetchCurrentUser();
   }, [navigate, toast]);
 
   // Filter pending appointments
@@ -126,7 +140,7 @@ const DoctorDashboardPage = () => {
   };
 
   // Calculate overall stats
-  const totalPatients = new Set(appointments.map(app => app.patientId)).size;
+  const totalPatients = doctor ? new Set(appointments.map(app => app.patientId)).size : 0;
   const totalAppointments = appointments.length;
   const confirmedAppointments = appointments.filter(app => app.status === "confirmed").length;
 

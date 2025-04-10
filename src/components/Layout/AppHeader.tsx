@@ -21,12 +21,21 @@ const AppHeader = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    setUser(currentUser);
+    const fetchCurrentUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+        setUser(null);
+      }
+    };
+    
+    fetchCurrentUser();
   }, [location]);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setUser(null);
     navigate("/");
   };
@@ -77,7 +86,7 @@ const AppHeader = () => {
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={isDoctor(user) ? user.profileImage : undefined} alt={user.name} />
                         <AvatarFallback className="bg-medical-100 text-medical-800">
-                          {user.name.charAt(0)}
+                          {user.name ? user.name.charAt(0) : ''}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -159,7 +168,7 @@ const AppHeader = () => {
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={isDoctor(user) ? user.profileImage : undefined} alt={user.name} />
                         <AvatarFallback className="bg-medical-100 text-medical-800">
-                          {user.name.charAt(0)}
+                          {user.name ? user.name.charAt(0) : ''}
                         </AvatarFallback>
                       </Avatar>
                     </div>
