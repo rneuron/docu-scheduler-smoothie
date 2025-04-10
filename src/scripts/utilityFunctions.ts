@@ -6,6 +6,9 @@ import { users } from "@/data/mockData";
 export async function createDemoDoctors() {
   // Filter out doctors from mock data
   const doctorUsers = users.filter(user => user.userType === "doctor");
+  let createdCount = 0;
+
+  console.log(`Starting to create ${doctorUsers.length} demo doctors...`);
   
   for (const doctor of doctorUsers) {
     try {
@@ -37,7 +40,6 @@ export async function createDemoDoctors() {
         full_name: doctor.name,
         specialty: (doctor as any).specialty || "Medicina General",
         location: (doctor as any).location || "Ciudad de México",
-        profile_image: (doctor as any).profileImage || null,
       };
 
       const { error: profileError } = await supabase
@@ -50,15 +52,57 @@ export async function createDemoDoctors() {
       }
 
       console.log(`Successfully created doctor: ${doctor.email}`);
+      createdCount++;
     } catch (error) {
       console.error(`Error creating doctor ${doctor.email}:`, error);
     }
   }
 
-  console.log("Demo doctor creation process completed!");
+  console.log(`Demo doctor creation process completed! Created ${createdCount} out of ${doctorUsers.length} doctors.`);
+  return createdCount;
 }
 
-// Export function to be accessible from window
+// Also add a verify function to check which doctors already exist
+export async function verifyDemoDoctors() {
+  const doctorUsers = users.filter(user => user.userType === "doctor");
+  const results = [];
+
+  console.log("Checking which demo doctors exist...");
+  
+  for (const doctor of doctorUsers) {
+    try {
+      // Try to sign in with the doctor's credentials
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: doctor.email,
+        password: "password123",
+      });
+
+      if (error) {
+        results.push({ email: doctor.email, exists: false, error: error.message });
+      } else {
+        results.push({ email: doctor.email, exists: true });
+      }
+      
+      // Sign out after attempting login
+      await supabase.auth.signOut();
+      
+    } catch (error) {
+      results.push({ email: doctor.email, exists: false, error: "Unknown error" });
+    }
+  }
+  
+  // Log detailed results
+  console.table(results);
+  
+  // Summary
+  const existingCount = results.filter(r => r.exists).length;
+  console.log(`Found ${existingCount} out of ${doctorUsers.length} doctors in the system.`);
+  
+  return results;
+}
+
+// Export functions to be accessible from window
 if (typeof window !== 'undefined') {
   (window as any).createDemoDoctors = createDemoDoctors;
+  (window as any).verifyDemoDoctors = verifyDemoDoctors;
 }
