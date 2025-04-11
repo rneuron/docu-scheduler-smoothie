@@ -101,8 +101,9 @@ export async function verifyDemoDoctors() {
   return results;
 }
 
-// Export functions to be accessible from window
+// Make functions globally available
 if (typeof window !== 'undefined') {
-  (window as any).createDemoDoctors = createDemoDoctors;
-  (window as any).verifyDemoDoctors = verifyDemoDoctors;
+  // Explicitly assign to window object
+  window.createDemoDoctors = createDemoDoctors;
+  window.verifyDemoDoctors = verifyDemoDoctors;
 }
