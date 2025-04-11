@@ -10,6 +10,8 @@ import { specialties } from "@/data/mockData";
 import { register } from "@/lib/auth";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const RegisterForm = () => {
   const [name, setName] = useState("");
@@ -20,18 +22,16 @@ const RegisterForm = () => {
   const [specialty, setSpecialty] = useState("");
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (password !== confirmPassword) {
-      toast({
-        title: "Las Contraseñas No Coinciden",
-        description: "Por favor asegúrese de que sus contraseñas coincidan",
-        variant: "destructive",
-      });
+      setError("Las contraseñas no coinciden");
       return;
     }
     
@@ -45,9 +45,11 @@ const RegisterForm = () => {
         ...(userType === "doctor" && {
           specialty,
           location,
+          // No longer including profileImage if it's null
         }),
       };
       
+      console.log("Attempting to register user:", { ...userData, password: "***" });
       const user = await register(userData, password);
       
       if (user) {
@@ -62,19 +64,11 @@ const RegisterForm = () => {
           navigate("/patient-dashboard");
         }
       } else {
-        toast({
-          title: "Registro Fallido",
-          description: "Hubo un problema al crear su cuenta. Es posible que el correo ya esté en uso.",
-          variant: "destructive",
-        });
+        setError("Hubo un problema al crear su cuenta. Es posible que el correo ya esté en uso.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
-      toast({
-        title: "Registro Fallido",
-        description: "Hubo un problema al crear su cuenta",
-        variant: "destructive",
-      });
+      setError(error?.message || "Hubo un problema al crear su cuenta");
     } finally {
       setIsLoading(false);
     }
@@ -95,6 +89,13 @@ const RegisterForm = () => {
             <TabsTrigger value="doctor">Médico</TabsTrigger>
           </TabsList>
         </Tabs>
+        
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
