@@ -32,8 +32,7 @@ export const login = async (email: string, password: string): Promise<User | nul
         userType: 'doctor',
         specialty: doctorData.specialty,
         location: doctorData.location,
-        // No profile_image in the database, so setting to null
-        profileImage: null, 
+        profileImage: doctorData.profile_image, 
       };
       return userData;
     } else {
@@ -81,8 +80,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
       userType: 'doctor',
       specialty: doctorData.specialty,
       location: doctorData.location,
-      // No profile_image in the database, so setting to null
-      profileImage: null,
+      profileImage: doctorData.profile_image,
     };
     return userData;
   } else {
@@ -109,6 +107,19 @@ export const isPatient = (user?: User | null): user is Patient => {
 
 export const register = async (userData: Partial<User>, password: string): Promise<User | null> => {
   try {
+    // Check if email is already registered
+    const { data: existingUsers, error: checkError } = await supabase
+      .from('users')
+      .select('email')
+      .eq('email', userData.email)
+      .maybeSingle();
+      
+    if (checkError && checkError.code !== 'PGRST116') {
+      // PGRST116 means "no rows returned", which is expected if email isn't used
+      console.error('Error checking existing user:', checkError);
+      throw new Error("Error al verificar si el correo ya está en uso");
+    }
+    
     // Register the user with Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: userData.email || '',
@@ -121,9 +132,19 @@ export const register = async (userData: Partial<User>, password: string): Promi
       }
     });
 
-    if (authError || !authData.user) {
-      console.error('Error registering user:', authError?.message);
-      return null;
+    if (authError) {
+      console.error('Error registering user:', authError.message);
+      
+      // Check for specific error types and provide clear messages
+      if (authError.message.includes("User already registered")) {
+        throw new Error("Este correo electrónico ya está registrado. Por favor intente con otro o inicie sesión.");
+      }
+      
+      throw new Error(authError.message);
+    }
+
+    if (!authData.user) {
+      throw new Error("No se pudo crear la cuenta. Por favor intente de nuevo.");
     }
 
     // If it's a doctor, add to the doctors table
@@ -143,7 +164,7 @@ export const register = async (userData: Partial<User>, password: string): Promi
       if (doctorError) {
         console.error('Error adding doctor profile:', doctorError.message);
         // You may want to delete the auth user if this fails
-        return null;
+        throw new Error("Error al crear el perfil de médico: " + doctorError.message);
       }
 
       const newDoctor: Doctor = {
@@ -170,6 +191,6 @@ export const register = async (userData: Partial<User>, password: string): Promi
     }
   } catch (error) {
     console.error('Error during registration:', error);
-    return null;
+    throw error; // Rethrow to handle in the component
   }
 };

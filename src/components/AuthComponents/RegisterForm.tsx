@@ -35,6 +35,16 @@ const RegisterForm = () => {
       return;
     }
     
+    if (userType === "doctor" && !specialty) {
+      setError("Por favor seleccione una especialidad");
+      return;
+    }
+    
+    if (userType === "doctor" && !location) {
+      setError("Por favor ingrese su ubicación");
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -45,7 +55,8 @@ const RegisterForm = () => {
         ...(userType === "doctor" && {
           specialty,
           location,
-          // No longer including profileImage if it's null
+          // No profile image when registering
+          profileImage: null,
         }),
       };
       

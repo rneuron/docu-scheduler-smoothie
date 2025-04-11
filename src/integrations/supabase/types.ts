@@ -95,6 +95,7 @@ export type Database = {
           full_name: string
           id: string
           location: string
+          profile_image: string | null
           specialty: string
         }
         Insert: {
@@ -102,6 +103,7 @@ export type Database = {
           full_name: string
           id: string
           location: string
+          profile_image?: string | null
           specialty: string
         }
         Update: {
@@ -109,6 +111,7 @@ export type Database = {
           full_name?: string
           id?: string
           location?: string
+          profile_image?: string | null
           specialty?: string
         }
         Relationships: []
