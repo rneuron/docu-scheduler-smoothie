@@ -32,7 +32,7 @@ export const login = async (email: string, password: string): Promise<User | nul
         userType: 'doctor',
         specialty: doctorData.specialty,
         location: doctorData.location,
-        profileImage: doctorData.profile_image, 
+        profileImage: doctorData.profile_image || null, 
       };
       return userData;
     } else {
@@ -80,7 +80,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
       userType: 'doctor',
       specialty: doctorData.specialty,
       location: doctorData.location,
-      profileImage: doctorData.profile_image,
+      profileImage: doctorData.profile_image || null,
     };
     return userData;
   } else {
@@ -107,18 +107,8 @@ export const isPatient = (user?: User | null): user is Patient => {
 
 export const register = async (userData: Partial<User>, password: string): Promise<User | null> => {
   try {
-    // Check if email is already registered
-    const { data: existingUsers, error: checkError } = await supabase
-      .from('users')
-      .select('email')
-      .eq('email', userData.email)
-      .maybeSingle();
-      
-    if (checkError && checkError.code !== 'PGRST116') {
-      // PGRST116 means "no rows returned", which is expected if email isn't used
-      console.error('Error checking existing user:', checkError);
-      throw new Error("Error al verificar si el correo ya está en uso");
-    }
+    // Don't check for existing users in the 'users' table since it doesn't exist
+    // in the public schema. Supabase manages users in the auth schema.
     
     // Register the user with Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
