@@ -22,7 +22,7 @@ export const fetchAllDoctors = async (): Promise<Doctor[]> => {
       userType: "doctor",
       specialty: doc.specialty,
       location: doc.location,
-      profileImage: null // There's no profile_image in the database yet
+      profileImage: doc.profile_image || null
     }));
     
     return doctors;
@@ -53,7 +53,7 @@ export const fetchDoctorsBySpecialty = async (specialty: string): Promise<Doctor
       userType: "doctor",
       specialty: doc.specialty,
       location: doc.location,
-      profileImage: null // There's no profile_image in the database yet
+      profileImage: doc.profile_image || null
     }));
     
     return doctors;
@@ -85,7 +85,7 @@ export const fetchDoctorById = async (doctorId: string): Promise<Doctor | null> 
       userType: "doctor",
       specialty: data.specialty,
       location: data.location,
-      profileImage: null // There's no profile_image in the database yet
+      profileImage: data.profile_image || null
     };
     
     return doctor;

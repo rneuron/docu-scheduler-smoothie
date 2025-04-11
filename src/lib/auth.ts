@@ -22,7 +22,7 @@ export const login = async (email: string, password: string): Promise<User | nul
       .from('doctors')
       .select('*')
       .eq('id', data.user.id)
-      .single();
+      .maybeSingle();
 
     if (doctorData) {
       const userData: Doctor = {
@@ -164,7 +164,7 @@ export const register = async (userData: Partial<User>, password: string): Promi
         userType: 'doctor',
         specialty: (userData as Partial<Doctor>).specialty || '',
         location: (userData as Partial<Doctor>).location || '',
-        profileImage: (userData as Partial<Doctor>).profileImage,
+        profileImage: (userData as Partial<Doctor>).profileImage || null,
       };
 
       return newDoctor;
