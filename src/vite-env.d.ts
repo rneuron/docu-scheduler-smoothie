@@ -5,4 +5,5 @@
 interface Window {
   createDemoDoctors: () => Promise<number>;
   verifyDemoDoctors: () => Promise<any[]>;
+  listAllDoctors: () => Promise<any[]>;
 }

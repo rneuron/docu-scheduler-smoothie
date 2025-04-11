@@ -1,16 +1,47 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { users } from "@/data/mockData";
 
 // This function can be called from the browser console
 export async function createDemoDoctors() {
-  // Filter out doctors from mock data
-  const doctorUsers = users.filter(user => user.userType === "doctor");
+  // Define doctors to create
+  const doctorsToCreate = [
+    {
+      name: "Dra. Laura Martínez",
+      email: "laura.martinez@ejemplo.com",
+      specialty: "Cardiología",
+      location: "Madrid, España",
+    },
+    {
+      name: "Dr. Carlos Ruiz",
+      email: "carlos.ruiz@ejemplo.com",
+      specialty: "Dermatología",
+      location: "Barcelona, España",
+    },
+    {
+      name: "Dra. María López",
+      email: "maria.lopez@ejemplo.com",
+      specialty: "Neurología",
+      location: "Valencia, España",
+    },
+    {
+      name: "Dr. Antonio García",
+      email: "antonio.garcia@ejemplo.com",
+      specialty: "Traumatología",
+      location: "Sevilla, España",
+    },
+    {
+      name: "Dra. Ana Rodríguez",
+      email: "ana.rodriguez@ejemplo.com",
+      specialty: "Pediatría",
+      location: "Bilbao, España",
+    }
+  ];
+  
   let createdCount = 0;
 
-  console.log(`Starting to create ${doctorUsers.length} demo doctors...`);
+  console.log(`Starting to create ${doctorsToCreate.length} demo doctors...`);
   
-  for (const doctor of doctorUsers) {
+  for (const doctor of doctorsToCreate) {
     try {
       // First create the auth user
       const { data, error } = await supabase.auth.signUp({
@@ -38,8 +69,8 @@ export async function createDemoDoctors() {
       const doctorData = {
         id: data.user.id,
         full_name: doctor.name,
-        specialty: (doctor as any).specialty || "Medicina General",
-        location: (doctor as any).location || "Ciudad de México",
+        specialty: doctor.specialty,
+        location: doctor.location,
       };
 
       const { error: profileError } = await supabase
@@ -58,36 +89,44 @@ export async function createDemoDoctors() {
     }
   }
 
-  console.log(`Demo doctor creation process completed! Created ${createdCount} out of ${doctorUsers.length} doctors.`);
+  console.log(`Demo doctor creation process completed! Created ${createdCount} out of ${doctorsToCreate.length} doctors.`);
   return createdCount;
 }
 
-// Also add a verify function to check which doctors already exist
+// Add a function to verify which doctors exist in Supabase
 export async function verifyDemoDoctors() {
-  const doctorUsers = users.filter(user => user.userType === "doctor");
+  // Same doctor emails as in createDemoDoctors
+  const doctorEmails = [
+    "laura.martinez@ejemplo.com",
+    "carlos.ruiz@ejemplo.com", 
+    "maria.lopez@ejemplo.com",
+    "antonio.garcia@ejemplo.com",
+    "ana.rodriguez@ejemplo.com"
+  ];
+  
   const results = [];
 
-  console.log("Checking which demo doctors exist...");
+  console.log("Checking which demo doctors exist in Supabase...");
   
-  for (const doctor of doctorUsers) {
+  for (const email of doctorEmails) {
     try {
       // Try to sign in with the doctor's credentials
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: doctor.email,
+        email: email,
         password: "password123",
       });
 
       if (error) {
-        results.push({ email: doctor.email, exists: false, error: error.message });
+        results.push({ email: email, exists: false, error: error.message });
       } else {
-        results.push({ email: doctor.email, exists: true });
+        results.push({ email: email, exists: true });
       }
       
       // Sign out after attempting login
       await supabase.auth.signOut();
       
     } catch (error) {
-      results.push({ email: doctor.email, exists: false, error: "Unknown error" });
+      results.push({ email: email, exists: false, error: "Unknown error" });
     }
   }
   
@@ -96,9 +135,28 @@ export async function verifyDemoDoctors() {
   
   // Summary
   const existingCount = results.filter(r => r.exists).length;
-  console.log(`Found ${existingCount} out of ${doctorUsers.length} doctors in the system.`);
+  console.log(`Found ${existingCount} out of ${doctorEmails.length} doctors in Supabase.`);
   
   return results;
+}
+
+// List all doctors from Supabase
+export async function listAllDoctors() {
+  console.log("Fetching all doctors from Supabase...");
+  
+  const { data, error } = await supabase
+    .from('doctors')
+    .select('*');
+    
+  if (error) {
+    console.error("Error fetching doctors:", error.message);
+    return [];
+  }
+  
+  console.log(`Found ${data.length} doctors in the database:`);
+  console.table(data);
+  
+  return data;
 }
 
 // Make functions globally available
@@ -106,4 +164,5 @@ if (typeof window !== 'undefined') {
   // Explicitly assign to window object
   window.createDemoDoctors = createDemoDoctors;
   window.verifyDemoDoctors = verifyDemoDoctors;
+  window.listAllDoctors = listAllDoctors;
 }
