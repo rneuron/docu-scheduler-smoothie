@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import { Doctor } from "@/types";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { getCurrentUser, isDoctor } from "@/lib/auth";
 
 interface DoctorCardProps {
   doctor: Doctor;
@@ -13,6 +15,18 @@ interface DoctorCardProps {
 
 const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
   const navigate = useNavigate();
+  const [isUserDoctor, setIsUserDoctor] = useState(false);
+  
+  useEffect(() => {
+    const checkUserRole = async () => {
+      const currentUser = await getCurrentUser();
+      if (currentUser && isDoctor(currentUser)) {
+        setIsUserDoctor(true);
+      }
+    };
+    
+    checkUserRole();
+  }, []);
   
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
@@ -42,12 +56,18 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
         </div>
       </CardContent>
       <CardFooter className="bg-gray-50 px-6 py-4">
-        <Button 
-          className="w-full" 
-          onClick={() => navigate(`/book-appointment/${doctor.id}`)}
-        >
-          Reservar Cita
-        </Button>
+        {isUserDoctor ? (
+          <Button variant="outline" className="w-full" disabled>
+            Los médicos no pueden reservar citas
+          </Button>
+        ) : (
+          <Button 
+            className="w-full" 
+            onClick={() => navigate(`/book-appointment/${doctor.id}`)}
+          >
+            Reservar Cita
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

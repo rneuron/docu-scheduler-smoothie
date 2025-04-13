@@ -7,7 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { TimeSlot, Doctor, User } from "@/types";
 import { getAvailableTimeSlots } from "@/lib/appointmentService";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isDoctor, isPatient } from "@/lib/auth";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -61,6 +61,15 @@ const BookingCalendar = ({ doctor, onBookAppointment }: BookingCalendarProps) =>
         variant: "destructive",
       });
       navigate("/login");
+      return;
+    }
+
+    if (isDoctor(user)) {
+      toast({
+        title: "Acción no permitida",
+        description: "Los médicos no pueden reservar citas. Esta función es solo para pacientes.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -125,10 +134,10 @@ const BookingCalendar = ({ doctor, onBookAppointment }: BookingCalendarProps) =>
         <Button
           className="w-full"
           size="lg"
-          disabled={!selectedSlot}
+          disabled={!selectedSlot || isDoctor(user)}
           onClick={handleBookAppointment}
         >
-          Reservar Cita
+          {isDoctor(user) ? "Los médicos no pueden reservar citas" : "Reservar Cita"}
         </Button>
       </div>
     </div>

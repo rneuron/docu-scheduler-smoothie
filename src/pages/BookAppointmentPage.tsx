@@ -6,20 +6,37 @@ import BookingCalendar from "@/components/AppointmentComponents/BookingCalendar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Mail } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, MapPin, Phone, Mail } from "lucide-react";
 import { mockDoctors } from "@/data/mockData";
 import { Doctor } from "@/types";
 import { bookAppointment } from "@/lib/appointmentService";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isDoctor } from "@/lib/auth";
 import { useToast } from "@/components/ui/use-toast";
 
 const BookAppointmentPage = () => {
   const { doctorId } = useParams<{ doctorId: string }>();
   const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [isUserDoctor, setIsUserDoctor] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if the current user is a doctor
+    const checkUserRole = async () => {
+      const currentUser = await getCurrentUser();
+      if (currentUser && isDoctor(currentUser)) {
+        setIsUserDoctor(true);
+        toast({
+          title: "Acceso Restringido",
+          description: "Los médicos no pueden reservar citas. Esta función es solo para pacientes.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    checkUserRole();
+    
     // Find the doctor by ID
     if (doctorId) {
       const foundDoctor = mockDoctors.find(d => d.id === doctorId);
@@ -49,6 +66,15 @@ const BookAppointmentPage = () => {
           variant: "destructive",
         });
         navigate("/login");
+        return;
+      }
+      
+      if (isDoctor(currentUser)) {
+        toast({
+          title: "Acción no permitida",
+          description: "Los médicos no pueden reservar citas. Esta función es solo para pacientes.",
+          variant: "destructive",
+        });
         return;
       }
       
@@ -106,6 +132,16 @@ const BookAppointmentPage = () => {
             Seleccione una fecha y un horario para programar su cita
           </p>
         </div>
+        
+        {isUserDoctor && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Acceso Restringido</AlertTitle>
+            <AlertDescription>
+              Como médico, no puede reservar citas. Esta función está disponible solo para pacientes.
+            </AlertDescription>
+          </Alert>
+        )}
         
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
